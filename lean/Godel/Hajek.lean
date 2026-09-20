@@ -47,9 +47,8 @@ no frame condition at all.
 
 ## Frame conditions
 
-`T3` needs **symmetry** and nothing else -- the modal logic `KB` (K plus
-symmetry; the logic usually written `B` is `KTB`, which also assumes
-reflexivity) -- for the same reason as Scott's:
+`T3` needs **symmetry** and nothing else -- the modal logic `KB`, K plus the
+symmetry axiom B -- for the same reason as Scott's:
 carrying the conclusion from a merely possible world back to the actual one.
 Everything before that step is frame-free.
 

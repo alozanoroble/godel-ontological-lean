@@ -8,9 +8,13 @@ biconditional `P(¬φ) ↔ ¬P(φ)`, which says that of every property exactly o
 of it and its negation is positive — an implausibly strong claim, and the
 half that Gödel's refutation does *not* need. Anderson keeps only
 
-    A1a.  P(¬φ) → ¬P(φ)
+    A1*.  P(φ) → ¬P(¬φ)
 
-and drops `A1b`. That alone would break the argument, so he strengthens the
+and drops `A1b`. (`Godel.AxiomA1`, which the other systems here share, is
+written the other way round, `P(¬φ) → ¬P(φ)`. The two are equivalent by
+contraposition alone — see `axiomA1_iff_A1star`, which checks it. Anderson's
+own orientation is the one displayed above, and the one used in the 2017
+computational study.) That alone would break the argument, so he strengthens the
 two definitions to compensate:
 
     Gᴬ(x)      :=  ∀φ ( P(φ) ↔ □φ(x) )
@@ -46,7 +50,12 @@ The derivations in this file assume reflexivity, transitivity **and** symmetry.
 - Benzmüller, Weber and Woltzenlogel Paleo (*Logica Universalis* 11, 2017)
   report `T3` automated in `KB` for Anderson's emendation, and further report
   `A4` and `A5` to be **redundant** there — derivable from the rest, `A4` in
-  `K4B` and `A5` already in `K`.
+  `K4B` and `A5` already in `K`. That holds under the constant- and
+  varying-domain readings they analyse. Under the **mixed** reading Anderson
+  himself floats (actualist quantifiers only in `T3` and in the definition of
+  essence), the same study finds `A4` still redundant but `A5` independent —
+  and reports a countermodel to `T3` itself. Domain choice is not a free
+  parameter here.
 
 So the right reading of every hypothesis below is *"what this particular Lean
 derivation consumes"*, never *"what Anderson's system requires"*. Tightening
@@ -107,6 +116,17 @@ structure Ax (r : W → W → Prop) (P : Property I W → Sentence W) : Prop whe
   A5  : ∀ w : W, P (NE r) w
 
 variable {r : W → W → Prop} {P : Property I W → Sentence W}
+
+/-- **Anderson's A1\* and the shared `AxiomA1` are the same axiom.**
+
+Anderson writes the retained half of A1 as `P(φ) → ¬P(¬φ)`; `Godel.AxiomA1`,
+shared with Gödel's, Scott's and Hájek's systems here, is written
+`P(¬φ) → ¬P(φ)`.  Both say "not both `φ` and `¬φ` are positive", and each is
+the contraposition of the other — no substitution and no double negation of
+properties is involved, so nothing turns on which is displayed. -/
+theorem axiomA1_iff_A1star :
+    AxiomA1 P ↔ ∀ (w : W) (φ : Property I W), P φ w → ¬ P (pneg φ) w :=
+  ⟨fun h w φ hp hn => h w φ hn hp, fun h w φ hn hp => h w φ hp hn⟩
 
 /-- **Theorem 1.**  A positive property is possibly instantiated.  This is
 Gödel's Theorem 1 unchanged — `Godel.possibly_exists` needs only `A1a` and

@@ -200,6 +200,16 @@ td.m{font-family:"IBM Plex Mono",monospace; font-size:13px; color:var(--muted)}
 @media (prefers-reduced-motion:reduce){ #tip{transition:none} }
 @media (hover:none),(pointer:coarse){ #tip{display:none} }
 
+/* ---------- references ---------- */
+.refs{padding-block:40px 10px; border-top:1px solid var(--line)}
+.refs h2{font-size:26px; font-weight:700; margin-bottom:18px}
+.refs ol{margin:0; padding-left:22px; display:flex; flex-direction:column; gap:12px}
+.refs li{font-size:14px; color:var(--muted); line-height:1.55; padding-left:4px}
+.refs li strong{color:var(--ink); font-weight:600}
+.refs li em{font-style:italic}
+.refs a{margin-left:6px; font-size:12px; text-transform:uppercase; letter-spacing:.06em; text-decoration:none; border-bottom:1px solid currentColor}
+.refs .note{display:block; margin-top:3px; font-size:13px; color:var(--faint)}
+
 /* ---------- footer ---------- */
 footer{padding-block:30px 56px; border-top:1px solid var(--line); color:var(--faint); font-size:13.5px}
 footer .stamp{margin-top:14px; padding-top:12px; border-top:1px dashed var(--line-soft); font-size:12.5px}
@@ -326,6 +336,55 @@ img{ max-width: 100%; }
     </div>
   </section>
 
+  <section class="refs">
+    <h2>References</h2>
+    <ol>
+      <li><strong>K. Gödel</strong>, “Ontological proof”, in <em>Collected Works III: Unpublished
+        Essays and Lectures</em>, Oxford University Press, 1995; also as Appendix A of Sobel's
+        <em>Logic and Theism</em>, Cambridge University Press, 2004, pp. 144–145.</li>
+      <li><strong>D. Scott</strong>, “Notes in Dana Scott's hand”, Appendix B of Sobel's
+        <em>Logic and Theism</em>, Cambridge University Press, 2004, pp. 145–146.</li>
+      <li><strong>J. H. Sobel</strong>, “Gödel's ontological proof”, in <em>On Being and Saying:
+        Essays for Richard Cartwright</em>, MIT Press, 1987, pp. 241–261. <span class="note">Modal
+        collapse.</span></li>
+      <li><strong>C. A. Anderson</strong>, “Some emendations of Gödel's ontological proof”,
+        <em>Faith and Philosophy</em> 7 (1990), no. 3, 291–303.
+        <a href="https://doi.org/10.5840/faithphil19907325">doi</a>
+        <span class="note">Footnote 5 is where B is said to suffice for Theorem 3.</span></li>
+      <li><strong>A. P. Hazen</strong>, “On Gödel's ontological proof”, <em>Australasian Journal
+        of Philosophy</em> 76 (1998), no. 3, 361–377.</li>
+      <li><strong>M. Fitting</strong>, <em>Types, Tableaus, and Gödel's God</em>, Kluwer, 2002.
+        <a href="https://doi.org/10.1007/978-94-010-0411-4">doi</a></li>
+      <li><strong>P. Hájek</strong>, “A new small emendation of Gödel's ontological proof”,
+        <em>Studia Logica</em> 71 (2002), no. 2, 149–164.
+        <a href="https://www.jstor.org/stable/20016426">jstor</a></li>
+      <li><strong>C. Benzmüller &amp; B. Woltzenlogel Paleo</strong>, “The inconsistency in
+        Gödel's ontological argument: a success story for AI in metaphysics”,
+        <em>IJCAI-16</em>, pp. 936–942.
+        <a href="https://www.ijcai.org/Proceedings/16/Papers/137.pdf">pdf</a>
+        <span class="note">The 2013 LEO-II detection, and §4.1 is the refutation formalised
+        here.</span></li>
+      <li><strong>C. Benzmüller, L. Weber &amp; B. Woltzenlogel Paleo</strong>,
+        “Computer-assisted analysis of the Anderson–Hájek ontological controversy”,
+        <em>Logica Universalis</em> 11 (2017), 139–151.
+        <a href="https://doi.org/10.1007/s11787-017-0160-9">doi</a>
+        <a href="https://page.mi.fu-berlin.de/cbenzmueller/papers/J32.pdf">pdf</a>
+        <span class="note">Source for Anderson's T3 in KB, A4 redundant in K4B, the mixed-domain
+        results, and Hájek's A4/A5 being superfluous but independent.</span></li>
+      <li><strong>C. Benzmüller &amp; D. Fuenmayor</strong>, “Computer-supported analysis of
+        positive properties, ultrafilters and modal collapse in variants of Gödel's ontological
+        argument”, <em>Bulletin of the Section of Logic</em> 49 (2020), no. 2, 127–148.
+        <a href="https://arxiv.org/abs/1910.08955">arXiv</a></li>
+      <li><strong>D. Fuenmayor &amp; C. Benzmüller</strong>, “Types, tableaus and Gödel's God in
+        Isabelle/HOL”, <em>Archive of Formal Proofs</em>, 2017.
+        <a href="https://www.isa-afp.org/entries/Types_Tableaus_and_Goedels_God.html">afp</a>
+        <span class="note">The Isabelle development these definitions are taken from.</span></li>
+      <li><strong>C. Benzmüller &amp; D. Scott</strong>, “Notes on Gödel's and Scott's variants of
+        the ontological argument”, <em>Monatshefte für Mathematik</em> 208 (2025), 569–611.
+        <a href="https://doi.org/10.1007/s00605-025-02078-x">doi</a></li>
+    </ol>
+  </section>
+
   <footer>
     <p>The inconsistency was automatically detected in 2013 by the prover LEO-II, then
     reconstructed and verified by Christoph Benzmüller and Bruno Woltzenlogel Paleo. Sobel
@@ -334,7 +393,7 @@ img{ max-width: 100%; }
     Hájek is Benzmüller, Weber and Woltzenlogel Paleo (2017).</p>
     <p>All five systems are formalised and certified in Lean 4 at
     <a href="https://github.com/alozanoroble/godel-ontological-lean">alozanoroble/godel-ontological-lean</a>.</p>
-    <p class="stamp">Page revised <strong>20 September 2026</strong><span id="rev"> · build a4f2899</span>. GitHub
+    <p class="stamp">Page revised <strong>20 September 2026</strong><span id="rev"> · build ce6053d</span>. GitHub
     Pages sets a ten-minute browser cache, so a copy loaded just before an update can lag by that
     much; a hard reload (<span class="kbd">Ctrl</span>/<span class="kbd">⌘</span> +
     <span class="kbd">Shift</span> + <span class="kbd">R</span>) always fetches the current one.</p>
@@ -383,7 +442,7 @@ const SYSTEMS = [
     h:"Where it breaks: the empty property",
     p:["Take the <strong>empty property</strong> — the property that, by definition, nothing has at any world. For intuition, think <em>being a round square</em>. Ask whether it is an essence of <strong>you</strong>.",
        "Check D2. Is everything you have necessarily implied by having the empty property? Take any property you have, say being over a metre tall. Is every bearer of the empty property over a metre tall? <strong>Yes</strong> — vacuously, because there are no bearers to falsify it. The same reason “every unicorn in my kitchen is purple” is true.",
-       "That works for every property you have. So by Gödel's definition, the empty property is an essence of you. And of me. And of a God-like being — which, by A5, has necessary existence, and so requires that <em>every</em> one of its essences be instantiated in every possible world. The definition then demands that the empty property be necessarily instantiated, which is impossible.",
+       "That works for every property you have. So by Gödel's definition, the empty property is an essence of you. And of me. And of a God-like being — which has necessary existence, because A5 says necessary existence is positive and D1 says a God-like being has every positive property, and so requires that <em>every</em> one of its essences be instantiated in every possible world. The definition then demands that the empty property be necessarily instantiated, which is impossible.",
        "Once the premises are inconsistent, derivability stops discriminating: in classical logic an inconsistent theory proves every formula, the intended conclusion included."]
   },
   gain:null,
@@ -402,15 +461,15 @@ const SYSTEMS = [
     {t:"Everything else, unchanged", items:[
       {tag:"D1", f:"G(x) := ∀φ ( P(φ) → φ(x) )", g:"x has every positive property", e:"Unchanged from Gödel."},
       {tag:"D3", f:"NE(x) := ∀φ ( φ ess x → □∃y φ(y) )", g:"every essence of x must be instantiated", e:"Unchanged in form — but “essence” now means Scott's essence, which is what makes the difference."},
-      {tag:"A1–A5", f:"as Gödel", g:"the five axioms are untouched", e:"Scott changed nothing in the axioms. The whole repair is the conjunct in D2."}
+      {tag:"A1–A5", f:"as Gödel", g:"the five axioms are untouched", e:"In this standard reconstruction Scott leaves A1–A5 unchanged; the decisive repair is the added conjunct in D2."}
     ]},
     {t:"Theorems", items:[
       {tag:"T1", f:"P(φ) → ◇∃x φ(x)", g:"a positive property could be instantiated", e:"As before, from A1 and A2. No frame condition."},
       {tag:"T2", f:"G(x) → G ess x", g:"God-likeness is a God-like being's essence", e:"Now provable properly, with the conjunct in place. Uses A1b and A4, and no frame condition."},
       {tag:"MT", f:"G(x) ∧ G(y) → x = y", g:"monotheism — God-like beings are unique",
-       e:"Take the property of being identical to x. If it were not positive, A1b would make its negation positive, and a God-like x — having every positive property — would fail to be self-identical. So it is positive, and any God-like y has it.|Uses A1b alone: no frame condition, no A4, no A5. <strong>An earlier version of this page claimed uniqueness was unavailable in Scott's system. That was false</strong>, and <span class='mono'>Godel.scott_monotheism</span> in the Lean development is the correction."},
+       e:"Take the property of being identical to x. If it were not positive, A1b would make its negation positive — and a God-like x, having every positive property, would then have the property of being <em>different</em> from x, giving x ≠ x. So it is positive; and any God-like y has every positive property, so y = x.|Uses A1b alone: no frame condition, no A4, no A5. <strong>An earlier version of this page claimed uniqueness was unavailable in Scott's system. That was false</strong>, and <span class='mono'>Godel.scott_monotheism</span> in the Lean development is the correction."},
       {tag:"T3", f:"□∃x G(x)", g:"necessarily, a God-like being exists",
-       e:"The argument goes through as Gödel intended. This derivation needs only <strong>symmetry</strong> of the accessibility relation — the normal modal logic <span class='mono'>KB</span> — not the full S5 in which the argument is usually presented.|(“B” on its own conventionally names <span class='mono'>KTB</span>, which also assumes reflexivity. Symmetry alone is <span class='mono'>KB</span>.)"},
+       e:"The argument goes through as Gödel intended. This derivation needs only <strong>symmetry</strong> of the accessibility relation — the normal modal logic <span class='mono'>KB</span> — not the full S5 in which the argument is usually presented.|Terminology: <span class='mono'>KB</span> is K plus the symmetry axiom B; the system conventionally named <span class='mono'>B</span> is <span class='mono'>KTB</span>, which adds reflexivity too. So Anderson's “the weaker logic B suffices” and the later “T3 holds in KB” are two different claims, both correct, the second sharper."},
       {tag:"MC", f:"p → □p", g:"modal collapse — every truth is necessary", flaw:true,
        e:"And here is the bill. For any proposition representable in the formal language: treat “being such that p” as a property. A God-like being has it; by Theorem 2 its God-likeness necessarily carries it along; and by Theorem 3 there is a God-like being at every accessible world. So p holds everywhere.|You had lunch today, so you <em>necessarily</em> had lunch today and could not have done otherwise. Nothing is contingent."}
     ]}
@@ -438,7 +497,7 @@ const SYSTEMS = [
       {tag:"A3*", f:"P(Gᴬ)", g:"the revised God-likeness is positive",
        e:"This is Anderson's Axiom 3*: the revised property of being God-like* is positive. It plays the role Gödel's A3 played, for the revised definition.|Fitting's presentation reaches it as Proposition 11.16 and the Isabelle development labels it <span class='mono'>T2</span>; an earlier version of this page copied that label, which wrongly suggested a derived theorem. It is postulated."},
       {tag:"A4", f:"P(φ) → □P(φ)", g:"positivity is not accidental",
-       e:"Anderson retains A4 and a revised A5*. But later computer-assisted analysis found <strong>both redundant</strong> for this emendation — derivable from the rest, A4 in K4B and A5 already in K — under the constant- and varying-domain semantics analysed."},
+       e:"Anderson retains A4 and a revised A5*. But later computer-assisted analysis found <strong>both redundant</strong> for this emendation — derivable from the rest, A4 in K4B and A5 already in K — under the constant- and varying-domain readings analysed.|Under the <em>mixed</em> reading Anderson himself floats — actualist quantifiers only in T3 and in the definition of essence — the same study finds A4 still redundant but A5 <em>independent</em>, and reports a countermodel to T3 itself. Domain choice is not a free parameter."},
       {tag:"A5*", f:"P(NEᴬ)", g:"necessary existence is a perfection", e:"Unchanged in form, built on Anderson's essence. See the note on A4: later analysis found it redundant here."}
     ]},
     {t:"Theorems", items:[

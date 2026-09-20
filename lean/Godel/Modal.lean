@@ -43,8 +43,10 @@ def dia (r : W → W → Prop) (p : Sentence W) : Sentence W :=
   fun w => ∃ v, r w v ∧ p v
 
 /-- Symmetry of the accessibility relation: the frame condition for the modal
-logic `KB` (K plus symmetry; note that the logic usually called `B` is `KTB`,
-which also assumes reflexivity).  This is the one frame condition the positive
+logic `KB`.  Terminology: `KB` is K plus the symmetry axiom B; the system
+conventionally named `B` is `KTB`, which adds reflexivity as well.  So
+Anderson's "the weaker logic B suffices" and the later "`T3` holds in `KB`"
+are two different, both-correct claims, the second sharper.  This is the one frame condition the positive
 argument of `Godel.Scott` actually needs. -/
 def Symm (r : W → W → Prop) : Prop := ∀ w v, r w v → r v w
 

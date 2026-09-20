@@ -44,10 +44,10 @@ true.
 ## Frame conditions
 
 The positive argument needs **symmetry** of the accessibility relation, and
-nothing else — no reflexivity, no transitivity.  That is the modal logic `KB`
-(K plus symmetry; the logic usually written `B` is `KTB`, which also assumes
-reflexivity),
-weaker than the `S5` in which the argument is usually presented.  Symmetry is
+nothing else — no reflexivity, no transitivity.  That is the modal logic `KB`:
+K plus the symmetry axiom B.  (The system conventionally named `B` is `KTB`,
+which adds reflexivity; both are weaker than the `S5` in which the argument is
+usually presented, and `KB` is weaker than `KTB`.)  Symmetry is
 used in exactly one place, `exists_god`.
 -/
 
