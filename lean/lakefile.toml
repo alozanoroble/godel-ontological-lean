@@ -1,0 +1,11 @@
+name = "godel"
+version = "0.1.0"
+defaultTargets = ["Godel"]
+
+[leanOptions]
+pp.unicode.fun = true
+relaxedAutoImplicit = false
+autoImplicit = false
+
+[[lean_lib]]
+name = "Godel"

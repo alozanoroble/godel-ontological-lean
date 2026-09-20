@@ -1,0 +1,10 @@
+.lake/
+build/
+*.olean
+*.ilean
+lake-manifest.json
+*.aux
+*.log
+*.out
+*.toc
+.DS_Store

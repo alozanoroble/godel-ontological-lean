@@ -1,0 +1,1241 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1.15in]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{fontspec}
+\usepackage{unicode-math}
+\setmathfont{latinmodern-math.otf}
+\setmonofont{DejaVu Sans Mono}[Scale=0.82]
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage[colorlinks=true,linkcolor=blue!50!black,citecolor=blue!50!black,
+            urlcolor=blue!50!black]{hyperref}
+
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Remark}
+
+\newcommand{\Prp}{\mathrm{Prop}}
+\newcommand{\ess}{\mathrel{\mathsf{ess}}}
+\newcommand{\esss}{\mathrel{\mathsf{ess}_{\mathrm{S}}}}
+\newcommand{\NE}{\mathsf{NE}}
+\newcommand{\NES}{\mathsf{NE}_{\mathrm{S}}}
+\newcommand{\Gd}{\mathsf{G}}
+\newcommand{\gd}{\mathsf{g}}
+\newcommand{\Pos}{\mathsf{P}}
+
+\title{G\"odel's Ontological Argument in Lean 4:\\
+       the 1970 inconsistency, modal collapse, and the emendations}
+\author{\'Alvaro Lozano-Robledo}
+\date{19 September 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+We give a Lean 4 formalization of G\"odel's ontological argument and of the
+three emendations of it, with a machine-checked record of exactly what each
+result depends on.
+
+G\"odel's own 1970 axioms are \emph{inconsistent}. This was discovered in 2013
+by the theorem prover Leo-II and analysed by Benzm\"uller and Woltzenlogel
+Paleo~\cite{bwp2016}; the mathematics of Section~\ref{sec:incons} is theirs. The
+culprit is a single missing conjunct: G\"odel's definition of \emph{essence}
+does not require that $x$ actually have $\varphi$, so the empty property is an
+essence of every individual, and Axiom~5 then demands that it be necessarily
+instantiated. The refutation needs Axioms 1, 2 and 5 only, and \emph{no frame
+condition whatsoever}: it lives in $K$.
+
+Scott's 1987 variant restores the conjunct. We formalize the argument G\"odel
+intended --- Theorems 2 and 3, concluding $\Box\exists x\,\Gd(x)$ --- and find
+that it needs only \emph{symmetry} of the accessibility relation, the modal
+logic $B$, rather than the $S5$ in which it is usually presented. We then
+formalize the price: \emph{modal collapse}, $p \to \Box p$, so that nothing is
+contingent. Read as a condition on the frame rather than on sentences, collapse
+forces the accessibility relation to be \emph{equality} --- every world sees
+itself and nothing else --- so $\Box$ and $\Diamond$ become the identity
+operation and no modal content survives. That settles the corresponding
+question about models: Scott's axioms are satisfiable over a world set of any
+size whatsoever, but only as a disjoint heap of isolated one-world models.
+There is no non-degenerate model to be found.
+
+All of this presupposes symmetry, and we show it cannot be dispensed with. An
+explicit model over a reflexive transitive frame --- an $S4$ frame --- satisfies
+Scott's axioms while refuting Theorem 3, modal collapse and the equality of the
+frame. So Scott's axioms do not entail modal collapse by themselves; they
+entail it in $B$ and $S5$, which is where the argument is always presented. The
+price is better read as a price of the frame strength the argument needs than
+of the axioms alone.
+
+We then formalize the three emendations that repair this. Anderson's drops the
+implausible half of Axiom 1 and strengthens God-likeness and essence to
+biconditionals; it makes God-like individuals unique, and its Theorem 3 needs
+full $S5$. Fitting's makes positivity a predicate on \emph{extensions} rather
+than intensional properties; its Theorem 3 needs no frame condition at all, and
+the reason connects directly to the previous paragraph. H\'ajek's merges two
+axioms into one weaker one, and the resulting definition of God-likeness makes
+his Axioms 4 and 5 superfluous: Theorem 3 follows from two of his four axioms.
+All three avoid modal collapse, and we exhibit two-world $S5$ models certifying
+it.
+
+For Fitting's variant we also separate the de re and de dicto readings of the
+conclusion. Both are theorems on the full axiom set; on his Part I axioms,
+before A4, they come apart, and we give the two-world model that separates
+them.
+
+Finally, one small structure does double duty. A model with one world and
+one individual satisfies Axioms 1--4 but refutes G\"odel's Axiom 5, certifying
+that the inconsistency is not an artefact of our encoding; and it satisfies
+\emph{all} of Scott's axioms, certifying that his system is consistent. The
+contrast between those two facts --- same model, same notion of positivity,
+opposite verdicts on Axiom~5 --- is the sharpest statement of what the missing
+conjunct costs.
+\end{abstract}
+
+\section{Introduction}
+
+G\"odel's ontological argument is a derivation, in second-order modal logic,
+of the conclusion that necessarily there exists a God-like being. It descends
+from Leibniz and ultimately from Anselm, but G\"odel's version is unusually
+sharp: a primitive predicate $\Pos$ (``is a positive property''), three
+definitions, five axioms, three theorems. G\"odel discussed the manuscript with
+Dana Scott, who circulated a slightly different version; it is Scott's variant
+that most of the subsequent literature analyses, and the two differ in exactly
+one conjunct in one definition.
+
+The difference is not cosmetic. In 2013 Benzm\"uller and Woltzenlogel Paleo ran
+the routine consistency check that precedes any serious attempt at machine
+proof, and the higher-order prover Leo-II reported that G\"odel's axioms were
+inconsistent~\cite{bwp2016}. Everything follows from them, including
+$\Box \exists x\, \Gd(x)$; the 1970 argument therefore establishes nothing
+whatever. G\"odel's omission had been remarked on before --- Hazen called it an
+oversight --- but its consequence had gone unnoticed for four decades.
+
+Scott's version is another matter. It is consistent, the argument goes through,
+and the objection that has dogged it since Sobel is not unsoundness but
+\emph{modal collapse}: the axioms entail that every truth is a necessary truth.
+
+This note formalizes all five systems in Lean 4, in 371 lines of code with no
+library dependencies. The point of doing so is not doubt about the mathematics, which
+is short and entirely comprehensible, but bookkeeping: in a formalization every
+axiom and every frame condition a result consumes appears as a named hypothesis
+of that result, and Lean's \verb|#print axioms| makes the foundational
+dependencies visible too. Several statements below consequently carry their
+hypotheses more precisely than the prose versions do.
+
+\paragraph{What is and is not new here.}
+None of the mathematics. The inconsistency, the Empty Essence Lemma and the
+refutation of Section~\ref{sec:incons} are due to Benzm\"uller and Woltzenlogel
+Paleo~\cite{bwp2016}, whose \S4.1 the derivation follows; Theorems 1--3 are
+G\"odel's; modal collapse is Sobel's~\cite{sobel}; the emendations are
+Anderson's~\cite{anderson}, Fitting's~\cite{fitting} and
+H\'ajek's~\cite{hajek}, and all three were mechanised in Isabelle/HOL
+by~\cite{afp,bf2020,bww2017}, from which the definitions used here are taken.
+The frame reading of modal collapse (Theorem~\ref{thm:frame}) is standard, and
+the superfluousness of H\'ajek's A4 and A5 (Theorem~\ref{thm:hajT3}) is
+reported in~\cite{bww2017}.
+
+What this note offers is an independent mechanization in a different
+foundation, with a different discipline: axioms and frame conditions are
+hypotheses of the theorems that use them rather than global postulates, so the
+accounting in Section~\ref{sec:frames} is carried in the statements and
+checked; and the models are explicit, constructive proof terms rather than the
+output of a model finder. Its purpose is corroboration and exposition, not
+discovery --- unlike the work it follows, nothing here was found
+automatically. Readers wanting the research frontier should go to the
+literature cited above, and to the ongoing dispute over the ultrafilter
+reading~\cite{og2026,benz2026}.
+
+The small accounting results of Sections~\ref{sec:frames}, \ref{sec:symm}
+and~\ref{sec:derededicto} --- that the 1970 refutation needs no frame
+condition, that symmetry is not weakenable towards $S4$, that Scott's axioms
+admit models at every cardinality, and the location of the de re/de dicto
+separation --- are ones we have not found stated, but they are elementary
+consequences of results in the cited work, and we do not claim them as new.
+Wernhard~\cite{wernhard} computes a frame condition for Scott's Theorem 3 by
+second-order quantifier elimination and leaves open whether it is the weakest;
+that question is the nearest thing to an opening this material still has.
+
+\section{The system}\label{sec:system}
+
+\subsection{Semantics}
+
+We work with a shallow embedding of quantified modal logic, which is the
+standard device for this kind of mechanization and is what makes the
+formalization short.
+
+Fix a type $W$ of possible worlds and a type $I$ of individuals. A
+\emph{sentence} is a map $W \to \Prp$, and a \emph{property} is a map
+$I \to W \to \Prp$; a property thus has an extension that may vary from world
+to world. Let $r \subseteq W \times W$ be an accessibility relation. We write
+\[
+  (\Box_r p)(w) \;:=\; \forall v\,\bigl(r\,w\,v \to p(v)\bigr),
+  \qquad
+  (\Diamond_r p)(w) \;:=\; \exists v\,\bigl(r\,w\,v \wedge p(v)\bigr).
+\]
+Quantifiers over individuals and over properties are read world by world, with
+a constant domain. Quantification over properties ranges over \emph{all} maps
+$I \to W \to \Prp$; see Section~\ref{sec:caveats} for why this matters.
+
+\emph{No condition is imposed on $r$ as part of the semantics.} Where a
+derivation needs one it is stated as a hypothesis of that derivation and
+nowhere else. This is the whole reason for keeping $r$ explicit rather than
+fixing it to the universal relation, and Section~\ref{sec:frames} collects what
+it buys.
+
+An axiom is asserted to hold \emph{at every world}. This is the ordinary
+reading, and Section~\ref{sec:incons} uses it in an essential way.
+
+\subsection{Definitions}
+
+The sole nonlogical primitive is
+$\Pos : (I \to W \to \Prp) \to (W \to \Prp)$, read ``$\varphi$ is a positive
+property'', and itself world-dependent: Axiom~4 asserts
+$\Pos(\varphi) \to \Box \Pos(\varphi)$, which would be idle if $\Pos$ were not
+allowed to vary.
+
+\begin{definition}[God-likeness]
+$\Gd(x) \;:=\; \forall \varphi\,\bigl(\Pos(\varphi) \to \varphi(x)\bigr)$.
+\end{definition}
+
+\begin{definition}[Essence]\label{def:ess}
+G\"odel's 1970 definition and Scott's 1987 emendation are
+\begin{align*}
+  \varphi \ess x  &\;:=\;
+    \forall \psi\,\Bigl(\psi(x) \to \Box\,\forall y\,\bigl(\varphi(y) \to \psi(y)\bigr)\Bigr), \\[2pt]
+  \varphi \esss x &\;:=\;
+    \varphi(x) \;\wedge\;
+    \forall \psi\,\Bigl(\psi(x) \to \Box\,\forall y\,\bigl(\varphi(y) \to \psi(y)\bigr)\Bigr).
+\end{align*}
+\end{definition}
+
+\noindent
+Both read: everything $x$ has, $\varphi$ necessarily carries with it. Scott
+adds the requirement that $x$ actually \emph{have} $\varphi$. That conjunct is
+the entire difference between the two systems, and everything below turns on
+it.
+
+\begin{definition}[Necessary existence]
+$\NE(x) := \forall \varphi\,(\varphi \ess x \to \Box\,\exists y\,\varphi(y))$,
+and $\NES(x)$ is the same with $\esss$ in place of $\ess$.
+\end{definition}
+
+\subsection{The axioms}
+
+\begin{description}
+  \item[A1a.] $\Pos(\neg\varphi) \to \neg\,\Pos(\varphi)$.
+  \item[A1b.] $\neg\,\Pos(\varphi) \to \Pos(\neg\varphi)$.
+  \item[A2.] $\Pos(\varphi) \wedge \Box\,\forall x\,(\varphi(x) \to \psi(x))
+             \;\to\; \Pos(\psi)$.
+  \item[A3.] $\Pos(\Gd)$.
+  \item[A4.] $\Pos(\varphi) \to \Box\,\Pos(\varphi)$.
+  \item[A5.] $\Pos(\NE)$ \quad(G\"odel) \qquad or \qquad $\Pos(\NES)$ \quad(Scott).
+\end{description}
+
+\noindent
+A1 is stated by both authors as the biconditional; we split it because the two
+halves are used by different results. \emph{G\"odel's system} is
+A1a, A1b, A2, A3, A4 together with $\Pos(\NE)$; \emph{Scott's system} is the
+same with $\Pos(\NES)$.
+
+\section{G\"odel's 1970 axioms are inconsistent}\label{sec:incons}
+
+The derivation has two moving parts. The first is G\"odel's own Theorem~1, and
+is uncontroversial; it is shared by both systems.
+
+\begin{lemma}[Theorem 1]\label{lem:T1}
+Assume {\rm A1a} and {\rm A2}. If $\Pos(\varphi)$ holds at $w$, then
+$(\Diamond_r \exists x\, \varphi(x))(w)$.
+\end{lemma}
+
+\begin{proof}
+Suppose not, so that $\varphi$ has empty extension at every world accessible
+from $w$. Let $\psi$ be arbitrary. Then
+$\Box_r \forall x\,(\varphi(x) \to \psi(x))$ holds at $w$ vacuously: at any
+accessible $v$ and any $y$, the antecedent $\varphi(y)$ fails. By A2 together
+with $\Pos(\varphi)$ we get $\Pos(\psi)$ at $w$. As $\psi$ was arbitrary,
+\emph{every} property is positive at $w$; in particular both $\Pos(\neg\varphi)$
+and $\Pos(\varphi)$, contradicting A1a.
+\end{proof}
+
+The second part is where the 1970 system comes apart.
+
+\begin{lemma}[Empty Essence Lemma~\cite{bwp2016}]\label{lem:empty}
+Let $e$ be the property with empty extension at every world. Then for every
+individual $x$ and every world $w$, $\,e \ess x\,$ holds at $w$.
+\end{lemma}
+
+\begin{proof}
+Let $\psi$ be any property with $\psi(x)$ at $w$; we must show
+$\Box_r \forall y\,(e(y) \to \psi(y))$ at $w$. Let $v$ be accessible from $w$
+and $y$ any individual. The antecedent $e(y)$ is false at $v$ by construction,
+so the implication holds.
+\end{proof}
+
+\noindent
+No axiom, no frame condition and no classical reasoning is used here: the
+statement is a triviality about vacuous implication. That is precisely what
+makes it dangerous. Definition~\ref{def:ess} places a \emph{demand} on
+$\varphi$ --- that it necessarily entail everything $x$ has --- and a property
+that nothing satisfies meets every such demand for free.
+
+\begin{remark}
+Benzm\"uller and Woltzenlogel Paleo observe that some philosophers may prefer
+to run the argument with the property of \emph{self-difference},
+$\lambda x.\, x \neq x$, in place of the empty property. Under full
+extensionality the two have the same denotation and the derivation is
+indifferent to which is used.
+\end{remark}
+
+\begin{theorem}[\cite{bwp2016}]\label{thm:main}
+Suppose $W$ is nonempty. Then {\rm A1a}, {\rm A2} and $\Pos(\NE)$ are jointly
+unsatisfiable, over an arbitrary accessibility relation $r$.
+\end{theorem}
+
+\begin{proof}
+By A5, $\Pos(\NE)$ holds at every world, so Lemma~\ref{lem:T1} gives
+\begin{equation}\label{eq:star}
+  \text{for every } w \in W \text{ there are } v \text{ with } r\,w\,v
+  \text{ and } x \in I \text{ with } \NE(x) \text{ at } v. \tag{$*$}
+\end{equation}
+
+Pick any $w_0 \in W$ and apply \eqref{eq:star}, obtaining such a $v$ and $x$.
+Unfolding, $\NE(x)$ at $v$ says
+$\forall \varphi\,(\varphi \ess x \to \Box_r \exists y\, \varphi(y))$.
+Instantiate at $\varphi := e$. By Lemma~\ref{lem:empty} the antecedent holds,
+so $\Box_r \exists y\, e(y)$ holds at $v$: at every world accessible from $v$,
+something has the empty property. Nothing has the empty property at any world.
+Hence
+\begin{equation}\label{eq:dead}
+  \text{no world is accessible from } v. \tag{$\dagger$}
+\end{equation}
+
+But \eqref{eq:star} holds at \emph{every} world, $v$ included, because the
+axioms do. Applying it at $v$ produces a world accessible from $v$, in direct
+contradiction with~\eqref{eq:dead}.
+\end{proof}
+
+\noindent
+Note that neither A3 nor A4 is used: the argument never needs a God-like being
+to exist, because Lemma~\ref{lem:T1} is applied to $\NE$ directly. The last
+step is what keeps the frame conditions at zero. A cruder argument would cash
+$\Box_r \exists y\, e(y)$ into a witness by assuming $r$ serial, at the cost of
+working in $D$; that is unnecessary, since the axioms are asserted everywhere
+and Lemma~\ref{lem:T1} can simply be reapplied at $v$.
+
+\begin{proposition}\label{prop:scott}
+For every individual $x$ and every world $w$, $\,e \esss x\,$ fails at $w$.
+\end{proposition}
+
+\begin{proof}
+It would require $e(x)$ at $w$, and $e$ has empty extension.
+\end{proof}
+
+\noindent
+So the Empty Essence Lemma --- the only input to Theorem~\ref{thm:main} beyond
+Theorem~1 --- is unavailable in Scott's system, and the derivation stops. This
+does not by itself show Scott's system consistent; that is
+Proposition~\ref{prop:scottcons} below.
+
+\section{Scott's variant: the positive argument}\label{sec:scott}
+
+We now carry out the argument G\"odel intended. Throughout this section the
+axioms are Scott's.
+
+\begin{lemma}\label{lem:posgod}
+Assume {\rm A1b}. If $\Gd(x)$ and $\psi(x)$ both hold at $w$, then
+$\Pos(\psi)$ holds at $w$.
+\end{lemma}
+
+\begin{proof}
+If $\Pos(\psi)$ failed at $w$ then $\Pos(\neg\psi)$ would hold there by A1b;
+since $x$ is God-like it has every positive property, so $\neg\psi(x)$ at $w$,
+contradicting $\psi(x)$.
+\end{proof}
+
+\begin{theorem}[Theorem 2]\label{thm:T2}
+Assume {\rm A1b} and {\rm A4}. If $\Gd(x)$ holds at $w$, then
+$\Gd \esss x$ holds at $w$. No frame condition is needed.
+\end{theorem}
+
+\begin{proof}
+The first conjunct of $\esss$ is $\Gd(x)$ at $w$, which is the hypothesis. For
+the second, let $\psi$ satisfy $\psi(x)$ at $w$. By Lemma~\ref{lem:posgod},
+$\Pos(\psi)$ at $w$, so by A4, $\Pos(\psi)$ holds at every world $v$ accessible
+from $w$. Let $v$ be such a world and let $y$ satisfy $\Gd(y)$ at $v$. Being
+God-like, $y$ has every property positive at $v$, and $\psi$ is one; so
+$\psi(y)$ at $v$. This is exactly
+$\Box_r \forall y\,(\Gd(y) \to \psi(y))$ at $w$.
+\end{proof}
+
+\begin{lemma}\label{lem:boxgod}
+Assume {\rm A1b}, {\rm A4} and $\Pos(\NES)$. If $\Gd(g)$ holds at $w$, then
+$\Box_r \exists y\, \Gd(y)$ holds at $w$.
+\end{lemma}
+
+\begin{proof}
+$\Pos(\NES)$ at $w$ and $\Gd(g)$ at $w$ give $\NES(g)$ at $w$. By
+Theorem~\ref{thm:T2}, $\Gd \esss g$ at $w$. Instantiate $\NES(g)$ at
+$\varphi := \Gd$.
+\end{proof}
+
+\noindent
+This is the step Scott's conjunct rescues. In G\"odel's system the same move,
+made with $\varphi := e$, is what produced Theorem~\ref{thm:main}.
+
+\begin{lemma}\label{lem:existsgod}
+Assume Scott's axioms and that $r$ is \emph{symmetric}. Then a God-like
+individual exists at every world.
+\end{lemma}
+
+\begin{proof}
+Let $w$ be any world. By A3 and Lemma~\ref{lem:T1} there are $v$ with $r\,w\,v$
+and $g$ with $\Gd(g)$ at $v$. By Lemma~\ref{lem:boxgod},
+$\Box_r \exists y\, \Gd(y)$ holds at $v$. By symmetry $r\,v\,w$, so
+$\exists y\, \Gd(y)$ holds at $w$.
+\end{proof}
+
+\begin{theorem}[Theorem 3]\label{thm:T3}
+Assume Scott's axioms and that $r$ is symmetric. Then
+$\Box_r \exists x\, \Gd(x)$ holds at every world.
+\end{theorem}
+
+\begin{proof}
+Combine Lemma~\ref{lem:existsgod} with Lemma~\ref{lem:boxgod}.
+\end{proof}
+
+\noindent
+This is the conclusion of the ontological argument, and it is worth being
+plain about what it is. It is a \emph{conditional}: it says that granting
+Scott's five axioms commits one to $\Box\exists x\,\Gd(x)$. Whether they should
+be granted is not a question a proof assistant can address. What a proof
+assistant \emph{can} do is compute the rest of the bill, which is the subject
+of the next section.
+
+\section{The price: modal collapse}\label{sec:collapse}
+
+\begin{theorem}[Modal collapse, Sobel]\label{thm:collapse}
+Assume Scott's axioms and that $r$ is symmetric. Then for every sentence $p$
+and every world $w$, if $p$ holds at $w$ then $\Box_r p$ holds at $w$.
+\end{theorem}
+
+\begin{proof}
+By Lemma~\ref{lem:existsgod} there is $g$ with $\Gd(g)$ at $w$, and by
+Theorem~\ref{thm:T2}, $\Gd \esss g$ at $w$. Regard $p$ as a property,
+$\psi_p := \lambda y.\, p$, constant in the individual. Then $\psi_p(g)$ at $w$
+is just $p$ at $w$, which holds; so the second conjunct of $\esss$ gives
+\[
+  \Box_r \forall y\,\bigl(\Gd(y) \to p\bigr) \quad\text{at } w .
+\]
+By Theorem~\ref{thm:T3}, $\Box_r \exists x\,\Gd(x)$ at $w$. So at each world
+accessible from $w$ there is a God-like individual, and hence $p$ holds there.
+\end{proof}
+
+\begin{corollary}
+If $r$ is in addition reflexive, then $p \leftrightarrow \Box_r p$ for every
+sentence $p$: the distinction between truth and necessary truth disappears.
+\end{corollary}
+
+Nothing is contingent. This is Sobel's objection, and it is worth stressing
+that it applies to Scott's \emph{consistent} system: it is not a symptom of the
+1970 defect, and repairing that defect does not touch it. Under the $S5$
+reading the consequence can be put more starkly still.
+
+\begin{theorem}\label{thm:oneworld}
+Assume Scott's axioms with $r$ the universal relation. Then any two worlds are
+equal: $W$ has at most one element.
+\end{theorem}
+
+\begin{proof}
+Apply Theorem~\ref{thm:collapse} to the sentence $p := \lambda u.\, u = w$,
+which holds at $w$. Then $\Box_r p$ at $w$, and since every world is accessible,
+$v = w$ for every $v$.
+\end{proof}
+
+\subsection{Collapse as a condition on the frame}\label{sec:frame}
+
+The same instance of Theorem~\ref{thm:collapse} says something more general,
+and more informative, once $r$ is not assumed universal. Modal collapse is
+usually stated as a fact about sentences; its semantic content is a fact about
+the accessibility relation.
+
+\begin{theorem}\label{thm:frame}
+Assume Scott's axioms and that $r$ is symmetric. Then $r$ is \emph{equality}:
+$r\,w\,v$ holds if and only if $v = w$.
+\end{theorem}
+
+\begin{proof}
+For one direction, apply Theorem~\ref{thm:collapse} at $w$ to
+$p := \lambda u.\, u = w$, which holds at $w$; this gives $\Box_r p$ at $w$,
+that is, $r\,w\,v \to v = w$. For the other, Lemma~\ref{lem:T1} applied to A3
+produces some $v$ with $r\,w\,v$; by what we have just shown $v = w$, so
+$r\,w\,w$.
+\end{proof}
+
+\noindent
+Two features of this deserve comment. The frame conditions are \emph{derived},
+not assumed: reflexivity and seriality are consequences of the axioms, not
+hypotheses added to make the argument work. And the conclusion is not that
+there are few worlds, but that no world can see another.
+
+\begin{corollary}\label{cor:inert}
+Under the same hypotheses, $\Box_r p \leftrightarrow p$ and
+$\Diamond_r p \leftrightarrow p$ for every sentence $p$.
+\end{corollary}
+
+So the modal operators are the identity operation. Theorem~\ref{thm:oneworld}
+is the special case in which $r$ is additionally required to be universal:
+equality and the universal relation agree only on a one-point set. But the
+general statement is the one that bites. The argument is conducted in a modal
+language about what is possible and what is necessary, and its own premises
+leave that language with nothing to say: every world is an isolated point,
+$\Box$ means nothing beyond ``here'', and the conclusion
+$\Box\exists x\,\Gd(x)$ reduces to $\exists x\,\Gd(x)$.
+
+\begin{remark}
+This is the standard semantic reading of modal collapse rather than a new
+observation; the condition $\forall x\,\forall y\,(r\,x\,y \to y = x)$ is
+stated directly as a rendering of $MC$ in the literature on computational
+variants of the argument. What Theorem~\ref{thm:frame} adds here is that it is
+\emph{derived} from Scott's axioms in the formalization, with the frame
+hypothesis (symmetry, and nothing else) recorded.
+\end{remark}
+
+\section{One model, two jobs}\label{sec:model}
+
+Let $W = I = \{*\}$, let $r$ be the universal relation, and put
+$\Pos(\varphi) :\Leftrightarrow \varphi(*)$ --- a property is positive exactly
+when the sole individual has it.
+
+\begin{proposition}\label{prop:toy}
+In this model {\rm A1a}, {\rm A1b}, {\rm A2}, {\rm A3} and {\rm A4} all hold,
+and G\"odel's {\rm A5}, $\Pos(\NE)$, fails.
+\end{proposition}
+
+\begin{proof}
+A1a and A1b both read $\neg\varphi(*) \to \neg\varphi(*)$. For A2, suppose
+$\varphi(*)$ and $\Box\forall x(\varphi(x)\to\psi(x))$; instantiating at the
+unique world and individual gives $\psi(*)$. For A3 we must check $\Gd(*)$,
+that is $\forall\varphi(\Pos(\varphi) \to \varphi(*))$, which unfolds to
+$\forall\varphi(\varphi(*) \to \varphi(*))$. A4 is immediate, there being one
+world. Finally $\Pos(\NE)$ fails: it would give $\NE(*)$, and instantiating at
+$e$, which is a G\"odel-essence of $*$ by Lemma~\ref{lem:empty}, yields
+$\exists y\, e(y)$.
+\end{proof}
+
+This is the non-triviality check that Theorem~\ref{thm:main} needs. A
+mechanized proof of $\bot$ from a list of hypotheses is only informative if the
+hypotheses have not been mis-stated into absurdity; nothing in
+Theorem~\ref{thm:main} would look different if A2 had been encoded in a form
+nothing could satisfy. Proposition~\ref{prop:toy} rules that out and isolates
+A5 as the axiom that tips the system over.
+
+The same model then settles a second question.
+
+\begin{proposition}\label{prop:scottcons}
+In the same model, with the same $\Pos$, Scott's {\rm A5}, $\Pos(\NES)$, holds.
+Hence Scott's system is consistent.
+\end{proposition}
+
+\begin{proof}
+We must check $\NES(*)$, that is, that every Scott-essence of $*$ is
+necessarily instantiated. Let $\varphi \esss *$. The first conjunct gives
+$\varphi(*)$, and with one world and one individual that is already
+$\Box\exists y\, \varphi(y)$.
+\end{proof}
+
+The contrast between Propositions~\ref{prop:toy} and~\ref{prop:scottcons} is
+the cleanest available statement of what G\"odel's omission costs. One
+structure, one notion of positivity; G\"odel's Axiom~5 fails in it and Scott's
+holds, and the only difference between them is the conjunct $\varphi(x)$. It
+also shows that the inconsistency of Section~\ref{sec:incons} is specific to
+the definition of essence rather than a defect of the surrounding axioms or of
+our encoding of them.
+
+This model is degenerate: one world, so $\Box$ is trivial and modal collapse
+holds vacuously. It is natural to ask whether that is an accident of choosing
+the smallest structure --- whether Scott's axioms have a model with several
+worlds standing in some genuine accessibility relation. Theorem~\ref{thm:frame}
+already answers the second half, but the first half deserves an explicit
+answer, since a theorem forbidding modal structure would be idle if it also
+forbade models outright.
+
+\begin{proposition}\label{prop:iso}
+Let $V$ be any type of worlds whatsoever, let $r$ be equality on $V$, take one
+individual, and put $\Pos(\varphi)$ at $w$ iff that individual has $\varphi$ at
+$w$. Then all of Scott's axioms hold.
+\end{proposition}
+
+\begin{proof}
+Each world sees only itself, so $\Box_r q$ at $w$ is just $q$ at $w$, and every
+axiom reduces to its one-world form, verified as in
+Proposition~\ref{prop:scottcons}.
+\end{proof}
+
+\noindent
+So the answer to ``does Scott's system have a non-degenerate model?'' is:
+\emph{yes in cardinality, no in modal structure}. The world set may be as large
+as one likes --- Proposition~\ref{prop:iso} places no hypothesis on $V$ at all
+--- but by Theorem~\ref{thm:frame} every such model is a disjoint heap of
+isolated copies of Proposition~\ref{prop:scottcons}, each with its own God-like
+individual, none able to see any other. The one-world model is not forced; but
+nothing better than a heap of one-world models is available.
+
+\section{Symmetry is necessary}\label{sec:symm}
+
+Symmetry is used in exactly one place, Lemma~\ref{lem:existsgod}, to carry
+$\Box\exists x\,\Gd(x)$ from a merely possible world back to the actual one.
+That is the $B$ schema $\Diamond\Box p \to p$. Everything downstream ---
+Theorem~\ref{thm:T3}, modal collapse, Theorem~\ref{thm:frame} --- inherits the
+hypothesis from there. It is natural to ask whether it can be weakened.
+
+It cannot, and the reflexivity and transitivity of $S4$ are no substitute.
+
+\begin{proposition}\label{prop:nosymm}
+There is a model of Scott's axioms over a reflexive, transitive, non-symmetric
+frame in which Theorem~\ref{thm:T3}, Theorem~\ref{thm:collapse} and
+Theorem~\ref{thm:frame} all fail.
+\end{proposition}
+
+\begin{proof}
+Let $W = \{0,1\}$ with $r\,w\,v$ iff $w = 0$ or $v = 1$: world $0$ sees both
+worlds, world $1$ sees only itself. This is reflexive and transitive, and not
+symmetric, since $r\,0\,1$ but not $r\,1\,0$. Take one individual $*$, and put
+\[
+  \Pos(\varphi)(w) \;:\Leftrightarrow\; \varphi(*)(1)
+  \qquad\text{at both worlds}.
+\]
+So positivity is imported wholesale from world $1$, where the model of
+Proposition~\ref{prop:scottcons} lives.
+
+A1a and A1b are immediate. For A2, the box hypothesis at either world
+instantiates at $v = 1$, which is accessible from both, and the argument of
+Proposition~\ref{prop:scottcons} applies. A3 asks for $\Gd(*)$ at $1$, which
+unfolds to $\forall\varphi(\varphi(*)(1) \to \varphi(*)(1))$. A4 holds because
+$\Pos(\varphi)$ is a constant sentence. A5 asks for $\NES(*)$ at $1$; every
+world accessible from $1$ is $1$ itself, so the demand reduces to the first
+conjunct of $\esss$, exactly as before.
+
+Now $\Gd(*)$ \emph{fails} at world $0$. Being God-like at $0$ would require
+having at $0$ every property positive there, hence every property one has at
+$1$; and $\lambda y\,w.\,(w = 1)$ is such a property, false at $0$. So there is
+no God-like individual at $0$. Since $r\,0\,0$, that refutes
+$\Box\exists x\,\Gd(x)$ at $0$, which is Theorem~\ref{thm:T3}. Modal collapse
+fails at $0$ as well: $\lambda u.\,(u=0)$ holds at $0$ but not at the
+accessible world $1$. And $r\,0\,1$ with $1 \neq 0$ refutes
+Theorem~\ref{thm:frame}.
+\end{proof}
+
+Two things follow. First, symmetry is not a convenience of the usual $S5$
+presentation that a sharper proof could remove; the $B$ schema is doing
+irreplaceable work, and it is doing it at precisely the step where the argument
+moves from possible existence to actual existence. Second, and more striking:
+
+\begin{corollary}\label{cor:nocollapse}
+Scott's axioms do not entail modal collapse.
+\end{corollary}
+
+\noindent
+They entail it \emph{in $B$ and $S5$} --- which is where the argument is always
+presented, so the objection stands where it is usually made. But collapse is a
+consequence of the axioms \emph{together with} a symmetric frame, not of the
+axioms alone, and Proposition~\ref{prop:nosymm} exhibits an $S4$ model of the
+axioms in which contingency survives. The price of the argument is therefore
+better stated as a price of the frame it is run in: strengthen the logic enough
+to deliver the conclusion, and you get the collapse with it.
+
+\begin{remark}
+This is consistent with, and gives one explanation of, the report
+in~\cite{bwp2016} that the argument needs $KB$ --- symmetry and nothing more.
+It also locates the target for the emendations, which is the subject of
+Section~\ref{sec:variants}.
+\end{remark}
+
+\section{The emendations}\label{sec:variants}
+
+Anderson~\cite{anderson} and Fitting~\cite{fitting} each modify the argument so
+as to keep the conclusion and lose the collapse. Benzm\"uller and
+Fuenmayor~\cite{bf2020} have analysed both on the computer; we follow their
+presentation, and in particular their rendering of Anderson's variant as
+Fitting gives it. This section formalizes each variant far enough to prove its
+Theorem 3 and to exhibit a model in which modal collapse fails.
+
+\subsection{Anderson: biconditionals in place of {\rm A1b}}
+
+Anderson's complaint is about A1b, $\neg\Pos(\varphi) \to \Pos(\neg\varphi)$,
+which says that of every property one of it and its negation is positive. That
+is a strong claim, and --- as Section~\ref{sec:incons} showed --- not one the
+refutation of G\"odel's system ever needed. Anderson drops it. Dropping it
+alone breaks Theorem 2, so he strengthens the two definitions to compensate:
+\begin{align*}
+  \Gd^{\mathrm{A}}(x) &\;:=\; \forall\varphi\,\bigl(\Pos(\varphi) \leftrightarrow \Box\varphi(x)\bigr), \\
+  \varphi \ess^{\mathrm{A}} x &\;:=\; \forall\psi\,\bigl(\Box\psi(x) \leftrightarrow \Box\forall y(\varphi(y)\to\psi(y))\bigr),
+\end{align*}
+with $\NE^{\mathrm{A}}$ as before but using $\ess^{\mathrm{A}}$. The axioms are
+A1a, A2, A4, $\Pos(\NE^{\mathrm{A}})$, and $\Pos(\Gd^{\mathrm{A}})$ postulated
+in place of A3.
+
+The biconditional in $\Gd^{\mathrm{A}}$ buys something Scott's system does not
+have.
+
+\begin{proposition}[Monotheism]\label{prop:mono}
+Over a reflexive frame, Anderson's axioms make God-like individuals unique: if
+$\Gd^{\mathrm{A}}(x)$ and $\Gd^{\mathrm{A}}(y)$ at $w$, then $y = x$.
+\end{proposition}
+
+\begin{proof}
+Let $\varphi := \lambda z\,u.\,(z = x)$. Then $\Box\varphi(x)$ holds at $w$, so
+$\Pos(\varphi)$ at $w$ by $\Gd^{\mathrm{A}}(x)$; so $\Box\varphi(y)$ at $w$ by
+$\Gd^{\mathrm{A}}(y)$; and reflexivity gives $\varphi(y)$ at $w$, i.e. $y = x$.
+\end{proof}
+
+\begin{lemma}\label{lem:transfer}
+Over an $S5$ frame, God-likeness is stable: if $\Gd^{\mathrm{A}}(x)$ at $w$ and
+$r\,w\,v$, then $\Gd^{\mathrm{A}}(x)$ at $v$.
+\end{lemma}
+
+\begin{proof}
+Let $\varphi$ be given. If $\Pos(\varphi)$ at $v$ then, by A4 at $v$ and
+symmetry, $\Pos(\varphi)$ at $w$; so $\Box\varphi(x)$ at $w$; and transitivity
+carries that to $\Box\varphi(x)$ at $v$. Conversely, if $\Box\varphi(x)$ at $v$
+then symmetry and transitivity give $\Box\varphi(x)$ at $w$, hence
+$\Pos(\varphi)$ at $w$, hence $\Pos(\varphi)$ at $v$ by A4.
+\end{proof}
+
+\begin{theorem}\label{thm:andT3}
+Over an $S5$ frame, Anderson's axioms entail $\Box\exists x\,\Gd^{\mathrm{A}}(x)$.
+\end{theorem}
+
+\begin{proof}
+God-likeness is an $\ess^{\mathrm{A}}$-essence of any God-like $x$: the forward
+direction of the biconditional follows from A4 and reflexivity, the backward
+direction from Lemma~\ref{lem:transfer}. The rest is as in
+Theorem~\ref{thm:T3}, with $\Pos(\NE^{\mathrm{A}})$ supplying necessary
+existence and reflexivity bringing $\Box\NE^{\mathrm{A}}(g)$ down to
+$\NE^{\mathrm{A}}(g)$.
+\end{proof}
+
+\subsection{Fitting: extensions in place of intensions}
+
+Fitting's move is different and, to our eye, the more illuminating of the two.
+In G\"odel's and Scott's systems $\Pos$ is a predicate on \emph{intensional}
+properties $I \to W \to \Prp$. Fitting makes it a predicate on
+\emph{extensions} --- plain, world-independent sets $S : I \to \Prp$ --- and
+re-reads the definitions accordingly:
+\[
+  \Gd^{\mathrm{F}}(x) \;:=\; \forall S : I \to \Prp,\ \Pos(S) \to S\,x,
+\]
+with essence and necessary existence likewise quantifying over extensions.
+
+This is exactly what disarms the collapse. The proof of
+Theorem~\ref{thm:collapse} took an arbitrary sentence $p$ and smuggled it into
+the essence clause as the constant \emph{intensional} property
+$\psi_p = \lambda y\,w.\,p(w)$, which tracks $p$ from world to world. An
+extension has no world argument. There is no extension that varies with $p$,
+the substitution has no counterpart, and the derivation stops.
+
+\begin{theorem}\label{thm:fitT3}
+Fitting's axioms entail $\Box\exists x\,\Gd^{\mathrm{F}}(x)$, \emph{over an
+arbitrary frame} --- the argument runs in $K$.
+\end{theorem}
+
+\begin{proof}
+Theorem 1 goes through as before, giving a world $v$ accessible from $w$ and an
+individual $g$, existing at $v$, with $\Gd^{\mathrm{F}}(g)$ as evaluated at
+$w$. God-likeness is an essence of $g$, by the argument of
+Theorem~\ref{thm:T2} with extensions in place of properties; A5 then gives
+$\Box\exists z\,\Gd^{\mathrm{F}}(z)$ at $w$.
+\end{proof}
+
+\noindent
+The absence of any frame condition here is not an accident, and
+Proposition~\ref{prop:nosymm} explains it. Symmetry was needed in Scott's
+system to carry a conclusion from a merely possible world back to the actual
+one. In Fitting's, the predicate $\Gd^{\mathrm{F}}(\cdot)$ evaluated at $w$ is
+determined by the positivity facts \emph{at $w$}; a witness found at an
+accessible world is a witness simpliciter, and there is nothing to carry back.
+Freezing the predicate is what removes the need for the $B$ schema.
+
+\subsection{H\'ajek: one axiom in place of two}\label{sec:hajek}
+
+H\'ajek's route is different again. He merges A1 and A2 into a single weaker
+axiom,
+\[
+  \text{H:A12}\qquad
+  \bigl(\Pos(\varphi) \wedge \Box\forall x(\varphi(x) \to \psi(x))\bigr)
+  \;\to\; \neg\,\Pos(\neg\psi),
+\]
+of which Anderson's A1a is the case $\psi := \varphi$, and which does
+\emph{not} assert that $\psi$ is positive --- only that $\neg\psi$ is not. He
+then rebuilds God-likeness on the derived notion
+\[
+  \Pos^{\#}(\varphi) \;:=\; \exists\psi\,\bigl(\Pos(\psi) \wedge \Box\forall y(\psi(y) \to \varphi(y))\bigr),
+  \qquad
+  \Gd^{\mathrm{H}}(x) \;:=\; \forall\varphi\,\bigl(\Box\varphi(x) \leftrightarrow \Pos^{\#}(\varphi)\bigr),
+\]
+keeping Anderson's essence and necessary existence unchanged. The axioms are
+H:A12, A3, A4 and A5.
+
+The striking feature is that the last two are not needed.
+
+\begin{theorem}\label{thm:hajT3}
+{\rm H:A12} and {\rm A3} alone, over a symmetric frame, entail
+$\Box\exists x\,\Gd^{\mathrm{H}}(x)$. Neither {\rm A4} nor {\rm A5} is used.
+\end{theorem}
+
+\begin{proof}
+Theorem 1 goes through from H:A12: if $\varphi$ were necessarily empty its
+entailment hypothesis would hold vacuously for every $\psi$, and $\psi := \neg\varphi$
+makes the conclusion say that $\varphi$ is not positive. Applied to A3 this
+gives a world $v$ accessible from $w$ with some $g$ satisfying
+$\Gd^{\mathrm{H}}(g)$ there.
+
+Now the key step. $\Gd^{\mathrm{H}}$ is positive by A3, so it is necessarily
+implied by a positive property --- itself --- and hence
+$\Pos^{\#}(\Gd^{\mathrm{H}})$ holds outright. The biconditional in
+$\Gd^{\mathrm{H}}(g)$ converts that directly into $\Box\Gd^{\mathrm{H}}(g)$:
+the God-like individual is necessarily God-like. So
+$\Box\exists x\,\Gd^{\mathrm{H}}(x)$ holds at $v$, symmetry brings
+$\exists x\,\Gd^{\mathrm{H}}(x)$ back to $w$, and the same step applied at $w$
+finishes.
+\end{proof}
+
+\noindent
+Where Scott needs A5 and an essence argument to make God-like existence
+necessary, H\'ajek's definition delivers it outright. Benzm\"uller, Weber and
+Woltzenlogel Paleo report exactly this superfluousness, and add that A4 and A5
+are nonetheless \emph{independent} of the rest --- superfluous without being
+redundant~\cite{bww2017}. We have formalized the superfluousness; the
+independence needs a further pair of models and is not done here.
+
+\subsection{All three avoid modal collapse}
+
+\begin{proposition}\label{prop:variantsnocollapse}
+Each of the three variants has a two-world model over the universal relation
+--- an $S5$ frame --- satisfying all of its axioms, in which modal collapse
+fails.
+\end{proposition}
+
+\begin{proof}
+For Fitting, take one individual existing at both worlds and call a set
+positive exactly when the individual belongs to it. For Anderson and for
+H\'ajek, take one individual and call a property positive exactly when the
+individual has it at \emph{every} world. In each case the axioms are routine to
+verify, and $\lambda u.\,(u = w_0)$ holds at $w_0$ but not at the other world.
+\end{proof}
+
+\noindent
+Each model also certifies the consistency of the variant it belongs to. The
+mechanisms differ: Fitting's essence clause cannot express a contingent
+sentence at all, whereas Anderson's and H\'ajek's God-likeness are stated
+entirely in terms of $\Box$, so a contingent sentence never reaches their
+biconditionals.
+
+\begin{remark}
+One small thing the formalization turned up. In Scott's system the step ``what
+a God-like individual has is positive'' (Lemma~\ref{lem:posgod}) is classical,
+because it argues by contradiction through A1b. Anderson has no A1b, and his
+corresponding steps --- Proposition~\ref{prop:mono}, Lemma~\ref{lem:transfer},
+the essence theorem and the necessary-existence step --- are all
+\emph{constructive}; Lean reports them as depending on no axioms at all. Only
+Theorem~1, and hence Theorem~\ref{thm:andT3}, remains classical. Fitting keeps
+A1b and with it the classical step.
+\end{remark}
+
+\subsection{What is simplified here}\label{sec:variantscaveats}
+
+Fitting's own setting is an intensional higher-order modal logic with actualist
+quantifiers, and it supports distinctions this note does not draw. Two
+departures should be recorded.
+
+First, \emph{actualist quantifiers}. Our Fitting formalization carries an
+explicit existence predicate and quantifies only over individuals existing at
+the world in question. This is not optional: because a Fitting extension is
+world-independent, with constant domains ``$S$ is empty'' would be a
+world-independent statement, Theorem 1 would yield actual rather than merely
+possible exemplification, and Theorem~\ref{thm:fitT3} would follow without ever
+using A5 --- which is not Fitting's argument. Our Anderson formalization, by
+contrast, uses constant domains, and there this costs nothing structural: his
+God-likeness is intensional, so $\exists x\,\Gd^{\mathrm{A}}(x)$ still varies
+from world to world and A5 still does real work.
+
+Second, Fitting's logic has intension and extension operators which we have not
+embedded, and which are needed to write his \emph{syntax}. As
+Section~\ref{sec:derededicto} shows, the distinction those operators are for is
+nonetheless available here, because in a shallow embedding it amounts to where
+a world variable is bound.
+
+\subsection{De re and de dicto}\label{sec:derededicto}
+
+The predicate $\Gd^{\mathrm{F}}(z)$ carries two worlds' worth of information:
+the individual $z$, and the world at which positivity is read off. So a claim
+about God-like existence has two readings,
+\[
+  \underbrace{\forall v\,\bigl(r\,w\,v \to \exists z\ (\mathrm{E}z\,v \wedge \Gd^{\mathrm{F}}(z)\text{ at }w)\bigr)}_{\text{de re}}
+  \qquad
+  \underbrace{\forall v\,\bigl(r\,w\,v \to \exists z\ (\mathrm{E}z\,v \wedge \Gd^{\mathrm{F}}(z)\text{ at }v)\bigr)}_{\text{de dicto}}
+\]
+and no extra machinery is needed to state them: the difference is whether the
+last world argument is $w$ or $v$. Theorem~\ref{thm:fitT3} is the de re
+reading.
+
+\begin{theorem}\label{thm:fitdd}
+Fitting's axioms entail the de dicto reading as well, again over an arbitrary
+frame.
+\end{theorem}
+
+\begin{proof}
+It suffices that God-likeness is stable: if $\Gd^{\mathrm{F}}(x)$ at $w$ and
+$r\,w\,v$, then $\Gd^{\mathrm{F}}(x)$ at $v$. By A4 the extension
+$\gd_w := \{z : \Gd^{\mathrm{F}}(z)\text{ at }w\}$, positive at $w$ by T2,
+is positive at $v$; so anything God-like at $v$ lies in $\gd_w$, that is, is
+God-like at $w$. Theorem 1 supplies some $z$ God-like at $v$; that $z$ is then
+God-like at $w$, and God-like individuals are unique at a world --- by the
+argument of Proposition~\ref{prop:mono}, which works verbatim for Fitting's
+system --- so $z = x$ and $x$ is God-like at $v$.
+\end{proof}
+
+\noindent
+So with the full axiom set both readings hold. They do come apart, but earlier:
+on the Part I axioms A1a, A1b, A2 and T2, before A4 is available. This is the
+separation Benzm\"uller and Fuenmayor report, and it is worth being precise
+about its location, since it is easy to mistake for a limitation on the
+conclusion.
+
+\begin{proposition}\label{prop:dd}
+There is a model of the Part I axioms in which God-like existence is de re
+possible but not de dicto possible.
+\end{proposition}
+
+\begin{proof}
+Two worlds $\{0,1\}$ and two individuals $\{0,1\}$. Each world sees only the
+other, $r\,w\,v \iff w \neq v$; the individual existing at a world is the other
+one, $\mathrm{E}\,z\,v \iff z \neq v$; and a set is positive at $w$ exactly
+when it contains $w$'s own individual.
+
+Then $\Gd^{\mathrm{F}}(z)$ at $w$ holds iff $z = w$: positivity at $w$ is the
+principal ultrafilter at $w$, so the only member of every positive set is $w$
+itself. A1a, A1b and T2 are immediate. For A2, the world $\lnot w$ is
+accessible from $w$ and $w$ exists there, so the entailment hypothesis
+instantiates to $S\,w \to T\,w$.
+
+Now $\Gd^{\mathrm{F}}$ is de re possible at $w$: the accessible world $\lnot w$
+holds the individual $w$, which exists there and is God-like as read off at
+$w$. But it is not de dicto possible, anywhere: the individual God-like at a
+world is that world's own, and that is precisely the one that does not exist
+there.
+\end{proof}
+
+\noindent
+A4 must fail in this model, and does --- the singleton $\{0\}$ is positive at
+world $0$ and not at world $1$. Given Theorem~\ref{thm:fitdd} it could not be
+otherwise.
+
+Two features of the separation are worth drawing out. It needs a
+\emph{non-universal} frame: A4 propagates positivity along $r$, so when every
+world sees every world it makes positivity world-independent, God-likeness
+world-independent with it, and the two readings identical. And it needs
+\emph{varying domains}: the room for them to come apart is an individual that
+is God-like as read off at $w$ but does not exist at $v$. That is a second
+reason, beyond the one in Section~\ref{sec:variantscaveats}, why the existence
+predicate in this development is not optional.
+
+\section{Frame conditions, tabulated}\label{sec:frames}
+
+Keeping $r$ unconstrained in the semantics makes the following visible. Each
+row lists the frame condition the result actually consumes, which in two cases
+is weaker than the logic in which the result is usually stated.
+
+\begin{center}
+\begin{tabular}{@{}lll@{}}
+\toprule
+Result & Axioms used & Frame condition \\
+\midrule
+Theorem 1 (Lemma~\ref{lem:T1})        & A1a, A2                 & none \\
+Empty Essence (Lemma~\ref{lem:empty}) & none                    & none \\
+Inconsistency (Thm.~\ref{thm:main})   & A1a, A2, $\Pos(\NE)$    & none \quad($K$) \\
+Theorem 2 (Thm.~\ref{thm:T2})         & A1b, A4                 & none \\
+Theorem 3 (Thm.~\ref{thm:T3})         & all of Scott's          & symmetry \quad($B$) \\
+Modal collapse (Thm.~\ref{thm:collapse}) & all of Scott's       & symmetry \quad($B$) \\
+$r$ is equality (Thm.~\ref{thm:frame}) & all of Scott's         & symmetry \quad($B$) \\
+One world (Thm.~\ref{thm:oneworld})   & all of Scott's          & universal \quad($S5U$) \\
+\midrule
+Anderson's Thm.~3 (Thm.~\ref{thm:andT3}) & all of Anderson's    & refl., trans., symm. \quad($S5$) \\
+Fitting's Thm.~3 (Thm.~\ref{thm:fitT3})  & all of Fitting's     & none \quad($K$) \\
+H\'ajek's Thm.~3 (Thm.~\ref{thm:hajT3})  & H:A12, A3 \emph{only} & symmetry \quad($B$) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent
+By Proposition~\ref{prop:nosymm} the symmetry entries are sharp: rows three to
+six all fail over a reflexive transitive frame, so no weakening in the $S4$
+direction is available for Scott's system. The last three rows are the point of
+Section~\ref{sec:variants}: Anderson pays more in frame strength than Scott
+does, Fitting pays nothing at all, H\'ajek pays the same as Scott but with two
+of his four axioms unused --- and all three avoid the collapse. Frame strength
+is not the variable that matters.
+
+\noindent
+Two comments. First, the refutation of G\"odel's axioms needs no frame
+condition at all, so it is not an artefact of choosing $S5$; the axioms are
+inconsistent in the weakest normal modal logic. Second, the positive argument
+needs only symmetry, not the reflexivity and transitivity of $S5$ --- which
+accords with the report in~\cite{bwp2016} that the argument goes through in
+$KB$. Theorem~\ref{thm:main} is the one place where the accounting is subtle:
+the refutation that Leo-II found automatically does use symmetry, and so lives
+in $KB$; the human-constructed refutation of~\cite{bwp2016} formalized here
+does not.
+
+\section{The Lean 4 development}\label{sec:lean}
+
+The development is 1383 lines across seven files, of which 371 are code and the
+rest documentation, with \textbf{no dependency on Mathlib or any other library} --- nothing beyond Lean's core
+logic is needed --- and builds in a couple of seconds. The shallow embedding is
+direct:
+
+\begin{quote}\small
+\begin{verbatim}
+abbrev Sentence (W : Type u) : Type u := W -> Prop
+abbrev Property (I : Type v) (W : Type u) := I -> W -> Prop
+
+def box (r : W -> W -> Prop) (p : Sentence W) : Sentence W :=
+  fun w => forall v, r w v -> p v
+\end{verbatim}
+\end{quote}
+
+\noindent
+Each axiom is a named predicate (\verb|AxiomA1|, \verb|AxiomA1b|, \dots), so a
+theorem's hypotheses state exactly which axioms it consumes; the two axiom sets
+are bundled as \verb|Godel1970 r P| and \verb|Scott1987 r P|. The two headline
+statements are
+
+\begin{quote}\small
+\begin{verbatim}
+theorem inconsistent_of_A1_A2_A5 [Nonempty W]
+    (hA1 : AxiomA1 P) (hA2 : AxiomA2 r P) (hA5 : AxiomA5 r P) : False
+
+theorem modal_collapse (hs : Symm r) (h : Scott1987 r P)
+    (p : Sentence W) (w : W) (hp : p w) : box r p w
+\end{verbatim}
+\end{quote}
+
+\noindent
+The first takes no hypothesis on \verb|r| at all, and the second takes exactly
+one: that is how the middle column of Section~\ref{sec:frames} is recorded, and
+it is checked rather than asserted. The correspondence with this note is
+
+\begin{quote}\small
+\begin{tabular}{@{}ll@{}}
+\verb|possibly_exists|            & Lemma~\ref{lem:T1} \\
+\verb|emptyProperty_ess|          & Lemma~\ref{lem:empty} \\
+\verb|godel_1970_inconsistent|    & Theorem~\ref{thm:main} \\
+\verb|empty_not_scottEss|         & Proposition~\ref{prop:scott} \\
+\verb|positive_of_god|            & Lemma~\ref{lem:posgod} \\
+\verb|scott_T2|                   & Theorem~\ref{thm:T2} \\
+\verb|box_exists_god_of_god|      & Lemma~\ref{lem:boxgod} \\
+\verb|exists_god|                 & Lemma~\ref{lem:existsgod} \\
+\verb|scott_T3|                   & Theorem~\ref{thm:T3} \\
+\verb|modal_collapse|             & Theorem~\ref{thm:collapse} \\
+\verb|s5_unique_world|            & Theorem~\ref{thm:oneworld} \\
+\verb|accessibility_eq|           & Theorem~\ref{thm:frame} \\
+\verb|box_iff|, \verb|dia_iff|    & Corollary~\ref{cor:inert} \\
+\verb|toy_satisfies_A1_A2_A3_A4|, \verb|toy_not_A5| & Proposition~\ref{prop:toy} \\
+\verb|toy_satisfies_scott|        & Proposition~\ref{prop:scottcons} \\
+\verb|iso_satisfies_scott|        & Proposition~\ref{prop:iso} \\
+\verb|ns_satisfies_scott|, \verb|ns_not_T3|, & \\
+\quad \verb|ns_not_modal_collapse| & Proposition~\ref{prop:nosymm} \\
+\verb|Anderson.monotheism|        & Proposition~\ref{prop:mono} \\
+\verb|Anderson.god_transfers|     & Lemma~\ref{lem:transfer} \\
+\verb|Anderson.T3|                & Theorem~\ref{thm:andT3} \\
+\verb|Fitting.T3|                 & Theorem~\ref{thm:fitT3} \\
+\verb|Hajek.T3|                   & Theorem~\ref{thm:hajT3} \\
+\verb|Anderson.noCollapse|, \verb|Fitting.noCollapse|, & \\
+\quad \verb|Hajek.noCollapse|     & Proposition~\ref{prop:variantsnocollapse} \\
+\end{tabular}
+\end{quote}
+
+Lean's \verb|#print axioms| reports what each theorem ultimately rests on. Every
+classical result in the development reports exactly
+\verb|[propext, Classical.choice, Quot.sound]|, and the following report
+\emph{no axioms at all}:
+
+\begin{quote}\small
+\begin{verbatim}
+emptyProperty_ess          does not depend on any axioms
+empty_not_scottEss         does not depend on any axioms
+toy_satisfies_A1_A2_A3_A4  does not depend on any axioms
+toy_not_A5                 does not depend on any axioms
+toy_satisfies_scott        does not depend on any axioms
+\end{verbatim}
+\end{quote}
+
+Three things should be read off this. First, neither G\"odel's nor Scott's
+axioms appear anywhere, because they are not axioms of the development: they
+are hypotheses, discharged by whoever claims to have a model. Every theorem is
+a conditional, which is what claims of this kind ought to be. Had the axioms
+been declared with Lean's \verb|axiom| command, the development would have been
+globally inconsistent and the certificate worthless.
+
+Second, the only axioms that do appear are Lean's own three --- propositional
+extensionality, choice, and soundness of quotients --- entering through the two
+classical steps, Lemma~\ref{lem:T1} and Lemma~\ref{lem:posgod}.
+
+Third, and most usefully, the consistency of Scott's system
+(\verb|toy_satisfies_scott|) is certified constructively and axiom-free. It is
+an explicit model, not the output of a model finder, and can be inspected.
+
+\section{Scope of the result}\label{sec:caveats}
+
+\paragraph{The comprehension assumption.}
+This is the one place where the results are relative to a reading. The
+quantifiers $\forall\varphi$ in the definitions of essence and of $\NE$ range
+over \emph{all} properties $I \to W \to \Prp$, which is what makes the empty
+property available for instantiation in Theorem~\ref{thm:main} --- and, on the
+other side, what makes the constant property $\psi_p$ available in
+Theorem~\ref{thm:collapse}. This is the standard second-order reading. A
+defender could restrict the range of property quantification so as to exclude
+necessarily uninstantiated properties, blocking Theorem~\ref{thm:main}; but
+G\"odel states no such restriction, and any restriction strong enough to
+exclude $e$ would need independent motivation, on pain of being introduced for
+no reason except to save the argument. Scott's emendation blocks the derivation
+without any such manoeuvre, which is a point in its favour --- though note that
+a comprehension restriction would be no help against modal collapse, which
+needs only a constant property.
+
+\paragraph{What is not shown.}
+Nothing here bears on whether God exists. Theorem~\ref{thm:main} says that one
+particular list of premises is self-contradictory and therefore proves
+everything, its intended conclusion included; an inconsistent argument is not a
+disproof of its conclusion, it is the absence of an argument.
+Theorem~\ref{thm:T3} says that another list of premises entails
+$\Box\exists x\,\Gd(x)$; whether to accept those premises is a question about
+the premises, and Theorem~\ref{thm:collapse} is the main reason most readers do
+not.
+
+\paragraph{Open.}
+H\'ajek's emendations are untouched, and Fitting's intension and extension
+operators are not embedded --- though Section~\ref{sec:derededicto} shows that
+the distinction they exist to express is available without them. What a proper
+embedding would add is the ability to write Fitting's own syntax, and with it
+the remaining readings he distinguishes, rather than the two that matter for
+the conclusion.
+
+\section*{Availability}
+
+The Lean sources, the build script and the axiom certificate are at
+\url{https://github.com/alozanoroble/godel-ontological-lean}. The development
+builds against Lean 4 \texttt{v4.34.0} with no external dependencies.
+
+\begin{thebibliography}{99}
+
+\bibitem{anderson}
+C. A. Anderson.
+\newblock Some emendations of G\"odel's ontological proof.
+\newblock \emph{Faith and Philosophy} 7 (1990), no.~3, 291--303.
+
+\bibitem{bwp2016}
+C. Benzm\"uller and B. Woltzenlogel Paleo.
+\newblock The inconsistency in G\"odel's ontological argument: a success story
+  for AI in metaphysics.
+\newblock In \emph{Proceedings of IJCAI-16}, pages 936--942, 2016.
+
+\bibitem{bf2020}
+C. Benzm\"uller and D. Fuenmayor.
+\newblock Computer-supported analysis of positive properties, ultrafilters and
+  modal collapse in variants of G\"odel's ontological argument.
+\newblock \emph{Bulletin of the Section of Logic} 49 (2020), no.~2, 127--148.
+
+\bibitem{bww2017}
+C. Benzm\"uller, L. Weber and B. Woltzenlogel Paleo.
+\newblock Computer-assisted analysis of the Anderson--H\'ajek ontological
+  controversy.
+\newblock \emph{Logica Universalis} 11 (2017), 139--151.
+
+\bibitem{benz2026}
+C. Benzm\"uller.
+\newblock A comment on modal collapse and ultrafilters in G\"odel's ontological
+  argument.
+\newblock arXiv:2608.07578, 2026.
+
+\bibitem{bk2026}
+C. Benzm\"uller and D. Kirchner.
+\newblock First-order modal logic in HOL: deep and shallow embeddings with
+  automated faithfulness.
+\newblock arXiv:2607.10880, 2026.
+
+\bibitem{bkmso}
+C. Benzm\"uller and D. Kirchner.
+\newblock Monadic second-order logic in HOL: deep and shallow with automated
+  faithfulness.
+\newblock arXiv:2609.07345, 2026.
+
+\bibitem{fitting}
+M. Fitting.
+\newblock \emph{Types, Tableaus, and G\"odel's God}.
+\newblock Kluwer, 2002.
+
+\bibitem{friedman}
+H. M. Friedman.
+\newblock A divine consistency proof for mathematics.
+\newblock In \emph{Ontology of Divinity}. De Gruyter, 2024.
+
+\bibitem{afp}
+D. Fuenmayor and C. Benzm\"uller.
+\newblock Types, tableaus and G\"odel's God in Isabelle/HOL.
+\newblock \emph{Archive of Formal Proofs}, 2017.
+
+\bibitem{goedel}
+K. G\"odel.
+\newblock Appendix A: notes in Kurt G\"odel's hand.
+\newblock In J. H. Sobel, editor, \emph{Logic and Theism: Arguments for and
+  Against Beliefs in God}, pages 144--145. Cambridge University Press, 2004.
+\newblock Also in \emph{Collected Works, Volume III: Unpublished Essays and
+  Lectures}, Oxford University Press, 1995.
+
+\bibitem{hajek}
+P. H\'ajek.
+\newblock A new small emendation of G\"odel's ontological proof.
+\newblock \emph{Studia Logica} 71 (2002), no.~2, 149--164.
+
+\bibitem{hazen}
+A. P. Hazen.
+\newblock On G\"odel's ontological proof.
+\newblock \emph{Australasian Journal of Philosophy} 76 (1998), no.~3, 361--377.
+
+\bibitem{kovac}
+S. Kova\v{c}.
+\newblock Some weakened G\"odelian ontological systems.
+\newblock \emph{Journal of Philosophical Logic} 32 (2003), no.~6, 565--588.
+
+\bibitem{og2026}
+P. Odifreddi and T. Gomes.
+\newblock G\"odel's ontological proof and its consistency consequences.
+\newblock \emph{Logica Universalis}, 2026.
+
+\bibitem{scott}
+D. S. Scott.
+\newblock Appendix B: notes in Dana Scott's hand.
+\newblock In J. H. Sobel, editor, \emph{Logic and Theism: Arguments for and
+  Against Beliefs in God}, pages 145--146. Cambridge University Press, 2004.
+
+\bibitem{sobel}
+J. H. Sobel.
+\newblock G\"odel's ontological proof.
+\newblock In \emph{On Being and Saying: Essays for Richard Cartwright}, pages
+  241--261. MIT Press, 1987.
+
+\bibitem{wernhard}
+C. Wernhard.
+\newblock Applying second-order quantifier elimination in inspecting G\"odel's
+  ontological proof.
+\newblock arXiv:2110.11108, 2021.
+
+\end{thebibliography}
+
+\end{document}

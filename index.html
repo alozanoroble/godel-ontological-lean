@@ -1,0 +1,585 @@
+<title>Gödel's God</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,600;0,700;1,400&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+:root{
+  --paper:#F3F5F8; --surface:#FFFFFF; --surface-2:#FAFBFD;
+  --ink:#141922; --body:#2C3442; --muted:#5D6779; --faint:#8B94A5;
+  --line:#DCE1E9; --line-soft:#E9ECF2;
+  --accent:#27408B; --accent-soft:#E7ECF8;
+  --flaw:#9B2334; --flaw-soft:#FBEAEC;
+  --cost:#8A5712; --cost-soft:#FBF1E2;
+  --holds:#1C6354; --holds-soft:#E4F1ED;
+  --shadow:0 1px 2px rgba(20,25,34,.05), 0 8px 24px -12px rgba(20,25,34,.14);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#10141B; --surface:#171D27; --surface-2:#1C2330;
+    --ink:#EEF1F6; --body:#C7CEDA; --muted:#98A2B3; --faint:#6C7789;
+    --line:#2A3342; --line-soft:#222A37;
+    --accent:#9DB4F0; --accent-soft:#1D2740;
+    --flaw:#F2919C; --flaw-soft:#2E1A1E;
+    --cost:#E0AE63; --cost-soft:#2C2317;
+    --holds:#7BC9B4; --holds-soft:#152A26;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#10141B; --surface:#171D27; --surface-2:#1C2330;
+  --ink:#EEF1F6; --body:#C7CEDA; --muted:#98A2B3; --faint:#6C7789;
+  --line:#2A3342; --line-soft:#222A37;
+  --accent:#9DB4F0; --accent-soft:#1D2740;
+  --flaw:#F2919C; --flaw-soft:#2E1A1E;
+  --cost:#E0AE63; --cost-soft:#2C2317;
+  --holds:#7BC9B4; --holds-soft:#152A26;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--paper); color:var(--body);
+  font-family:"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  font-size:16px; line-height:1.6; -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1140px; margin:0 auto; padding-inline:20px; padding-block:0}
+h1,h2,h3,h4{font-family:Spectral, Georgia, "Times New Roman", serif; color:var(--ink); text-wrap:balance; margin:0}
+a{color:var(--accent)}
+code,.mono{font-family:"IBM Plex Mono","DejaVu Sans Mono",ui-monospace,SFMono-Regular,Menlo,monospace}
+:focus-visible{outline:2px solid var(--accent); outline-offset:2px; border-radius:3px}
+
+/* ---------- masthead ---------- */
+.mast{padding-block:52px 34px; border-bottom:1px solid var(--line)}
+.eyebrow{
+  font-size:12px; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--faint); font-weight:500; margin-bottom:14px;
+}
+h1{font-size:clamp(34px,5.6vw,52px); font-weight:700; line-height:1.08; letter-spacing:-.015em}
+.standfirst{
+  margin-top:16px; max-width:64ch; font-size:17.5px; color:var(--muted);
+  font-family:Spectral, Georgia, serif;
+}
+.standfirst em{color:var(--ink); font-style:italic}
+
+/* ---------- primer ---------- */
+.primer{padding-block:34px 8px}
+.primer h2{font-size:14px; letter-spacing:.12em; text-transform:uppercase; color:var(--faint); font-family:"IBM Plex Sans",sans-serif; font-weight:600; margin-bottom:18px}
+.primer-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(248px,1fr)); gap:1px; background:var(--line); border:1px solid var(--line); border-radius:4px; overflow:hidden}
+.pcard{background:var(--surface); padding:20px 22px}
+.pcard h3{font-size:18px; font-weight:600; margin-bottom:8px}
+.pcard p{margin:0; font-size:14.5px; color:var(--muted)}
+.pcard .glyph{font-size:15px; color:var(--accent); display:block; margin-bottom:10px}
+
+/* ---------- explorer ---------- */
+.explorer{padding-block:40px; display:grid; grid-template-columns:230px 1fr; gap:36px; align-items:start}
+.rail{position:sticky; top:calc(env(safe-area-inset-top,0px) + 16px)}
+.rail h2{font-size:12px; letter-spacing:.12em; text-transform:uppercase; color:var(--faint); font-family:"IBM Plex Sans",sans-serif; font-weight:600; margin-bottom:12px}
+.rail ol{list-style:none; margin:0; padding:0; position:relative}
+.rail ol::before{content:""; position:absolute; left:7px; top:10px; bottom:10px; width:1px; background:var(--line)}
+.rail li{position:relative}
+.sysbtn{
+  display:block; width:100%; text-align:left; background:none; border:0; cursor:pointer;
+  padding:9px 6px 9px 28px; font:inherit; color:var(--muted); position:relative; border-radius:4px;
+}
+.sysbtn::before{
+  content:""; position:absolute; left:3px; top:16px; width:9px; height:9px; border-radius:50%;
+  background:var(--paper); border:1.5px solid var(--line-soft); box-shadow:0 0 0 3px var(--paper);
+}
+.sysbtn:hover{color:var(--ink)}
+.sysbtn[aria-selected="true"]{color:var(--ink)}
+.sysbtn[aria-selected="true"]::before{background:var(--accent); border-color:var(--accent)}
+.sysbtn .yr{display:block; font-size:12px; color:var(--faint); font-variant-numeric:tabular-nums; letter-spacing:.04em}
+.sysbtn .nm{display:block; font-family:Spectral,Georgia,serif; font-size:17.5px; font-weight:600; line-height:1.25}
+.sysbtn[aria-selected="true"] .nm{color:var(--accent)}
+
+/* ---------- panel ---------- */
+.panel{min-width:0}
+.phead{margin-bottom:6px}
+.badge{
+  display:inline-block; font-size:11.5px; font-weight:600; letter-spacing:.07em; text-transform:uppercase;
+  padding:4px 9px; border-radius:3px; margin-bottom:12px;
+}
+.badge.bad{background:var(--flaw-soft); color:var(--flaw)}
+.badge.warn{background:var(--cost-soft); color:var(--cost)}
+.badge.ok{background:var(--holds-soft); color:var(--holds)}
+.panel h2{font-size:clamp(25px,3.4vw,33px); font-weight:700; letter-spacing:-.01em}
+.panel h2 span{color:var(--faint); font-weight:400; font-size:.62em; letter-spacing:0}
+.history{margin:14px 0 0; max-width:62ch; color:var(--muted); font-size:15.5px}
+
+.hint{
+  margin:26px 0 12px; font-size:12.5px; color:var(--faint);
+  display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+}
+.hint .kbd{border:1px solid var(--line); border-radius:3px; padding:1px 6px; font-size:11.5px; color:var(--muted); background:var(--surface-2)}
+
+.grouphead{
+  font-size:11.5px; letter-spacing:.13em; text-transform:uppercase; color:var(--faint);
+  font-weight:600; margin:24px 0 9px; padding-bottom:7px; border-bottom:1px solid var(--line-soft);
+}
+.items{display:flex; flex-direction:column; gap:1px; background:var(--line-soft); border:1px solid var(--line-soft); border-radius:4px; overflow:hidden}
+.item{background:var(--surface)}
+.itembtn{
+  display:grid; grid-template-columns:52px 1fr; gap:14px; width:100%; text-align:left;
+  background:none; border:0; cursor:pointer; font:inherit; color:inherit;
+  padding:13px 16px; align-items:baseline; transition:background .12s ease;
+}
+@media (prefers-reduced-motion:reduce){ .itembtn{transition:none} }
+.itembtn:hover{background:var(--surface-2)}
+.itembtn[aria-expanded="true"]{background:var(--accent-soft)}
+.tag{
+  font-family:"IBM Plex Mono",monospace; font-size:12.5px; font-weight:500; color:var(--accent);
+  letter-spacing:.02em; padding-top:2px;
+}
+.item.flawed .tag{color:var(--flaw)}
+.formal{
+  font-family:"IBM Plex Mono","DejaVu Sans Mono",ui-monospace,monospace; font-size:14px;
+  color:var(--ink); line-height:1.65; overflow-wrap:anywhere;
+}
+.gloss{display:block; margin-top:5px; font-size:13.5px; color:var(--muted); font-family:"IBM Plex Sans",sans-serif}
+.explain{padding:0 16px 16px 82px; font-size:15px; color:var(--body); max-width:70ch}
+.explain p{margin:0 0 10px}
+.explain p:last-child{margin-bottom:0}
+.item.flawed .explain{border-left:2px solid var(--flaw); margin-left:16px; padding-left:16px}
+
+/* ---------- callouts ---------- */
+.callout{border-radius:4px; padding:20px 22px; margin-top:26px; border:1px solid}
+.callout h3{font-size:19px; font-weight:600; margin-bottom:9px}
+.callout p{margin:0 0 10px; font-size:15px; max-width:66ch}
+.callout p:last-child{margin-bottom:0}
+.callout.flaw{background:var(--flaw-soft); border-color:color-mix(in srgb, var(--flaw) 26%, transparent)}
+.callout.flaw h3{color:var(--flaw)}
+.callout.diff{background:var(--accent-soft); border-color:color-mix(in srgb, var(--accent) 26%, transparent)}
+.callout.diff h3{color:var(--accent)}
+
+.ledger{display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-top:26px}
+.led{border:1px solid var(--line); border-radius:4px; padding:18px 20px; background:var(--surface)}
+.led h4{font-size:12px; letter-spacing:.11em; text-transform:uppercase; font-family:"IBM Plex Sans",sans-serif; font-weight:600; margin-bottom:9px}
+.led.gain h4{color:var(--holds)}
+.led.lose h4{color:var(--cost)}
+.led p{margin:0; font-size:14.5px; color:var(--muted)}
+
+.facts{display:flex; gap:26px; flex-wrap:wrap; margin-top:24px; padding-top:18px; border-top:1px solid var(--line-soft)}
+.fact{font-size:13px}
+.fact dt{color:var(--faint); text-transform:uppercase; letter-spacing:.1em; font-size:11px; font-weight:600; margin-bottom:3px}
+.fact dd{margin:0; color:var(--ink); font-family:"IBM Plex Mono",monospace; font-size:13px}
+
+/* ---------- table ---------- */
+.compare{padding-block:44px 20px; border-top:1px solid var(--line)}
+.compare h2{font-size:26px; font-weight:700; margin-bottom:6px}
+.compare .sub{color:var(--muted); font-size:15px; max-width:62ch; margin:0 0 22px}
+.tscroll{overflow-x:auto; border:1px solid var(--line); border-radius:4px; background:var(--surface)}
+table{border-collapse:collapse; width:100%; min-width:640px; font-size:14px}
+th,td{text-align:left; padding:11px 15px; border-bottom:1px solid var(--line-soft); vertical-align:top}
+thead th{
+  font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--faint);
+  font-weight:600; background:var(--surface-2); white-space:nowrap;
+}
+tbody tr:last-child td{border-bottom:0}
+td.nm{font-family:Spectral,Georgia,serif; font-size:16px; font-weight:600; color:var(--ink); white-space:nowrap}
+td.yr{font-variant-numeric:tabular-nums; color:var(--muted)}
+td .pill{display:inline-block; font-size:11.5px; font-weight:600; padding:2px 8px; border-radius:3px; white-space:nowrap}
+.pill.bad{background:var(--flaw-soft); color:var(--flaw)}
+.pill.warn{background:var(--cost-soft); color:var(--cost)}
+.pill.ok{background:var(--holds-soft); color:var(--holds)}
+td.m{font-family:"IBM Plex Mono",monospace; font-size:13px; color:var(--muted)}
+
+/* ---------- tooltip ---------- */
+#tip{
+  position:fixed; z-index:50; max-width:380px; background:var(--surface); color:var(--body);
+  border:1px solid var(--line); border-radius:5px; box-shadow:var(--shadow);
+  padding:13px 15px; font-size:14px; line-height:1.55; pointer-events:none;
+  opacity:0; transform:translateY(-3px); transition:opacity .12s ease, transform .12s ease;
+}
+#tip.show{opacity:1; transform:translateY(0)}
+@media (prefers-reduced-motion:reduce){ #tip{transition:none} }
+@media (hover:none),(pointer:coarse){ #tip{display:none} }
+
+/* ---------- footer ---------- */
+footer{padding-block:30px 56px; border-top:1px solid var(--line); color:var(--faint); font-size:13.5px}
+footer p{margin:0 0 8px; max-width:70ch}
+
+/* ---------- narrow ---------- */
+@media (max-width:860px){
+  .explorer{grid-template-columns:1fr; gap:22px}
+  .rail{position:static}
+  .rail ol{display:flex; gap:6px; overflow-x:auto; padding-bottom:6px; scrollbar-width:thin}
+  .rail ol::before{display:none}
+  .sysbtn{padding:8px 13px; border:1px solid var(--line); border-radius:4px; white-space:nowrap; background:var(--surface)}
+  .sysbtn::before{display:none}
+  .sysbtn[aria-selected="true"]{border-color:var(--accent); background:var(--accent-soft)}
+  .sysbtn .nm{font-size:15.5px}
+  .ledger{grid-template-columns:1fr}
+  .explain{padding-left:16px}
+  .item.flawed .explain{margin-left:0}
+  .itembtn{grid-template-columns:44px 1fr; gap:10px}
+}
+</style>
+
+<div class="wrap">
+
+  <header class="mast">
+    <div class="eyebrow">Modal logic · 1970 – 2002</div>
+    <h1>Gödel's God</h1>
+    <p class="standfirst">Kurt Gödel left a proof of God's existence in his notes: five axioms, three
+    definitions, three theorems. It is also <em>self-contradictory</em> — and nobody noticed for
+    forty-three years. Here is every line of it, what went wrong, and the four repairs.</p>
+  </header>
+
+  <section class="primer">
+    <h2>Three words you need first</h2>
+    <div class="primer-grid">
+      <div class="pcard">
+        <span class="glyph mono">□ p &nbsp; ◇ p</span>
+        <h3>Possible worlds</h3>
+        <p>To make “must” and “could” precise, imagine a catalogue of complete ways reality might
+        have gone. Ours is one entry. <span class="mono">□p</span> means p holds in every entry;
+        <span class="mono">◇p</span> means in at least one.</p>
+      </div>
+      <div class="pcard">
+        <span class="glyph mono">φ, ψ</span>
+        <h3>Properties</h3>
+        <p>Anything a thing can be — tall, kind, prime. The argument quantifies over <em>all</em>
+        properties, and over properties of properties, so keep the two levels apart.</p>
+      </div>
+      <div class="pcard">
+        <span class="glyph mono">P(φ)</span>
+        <h3>Positive</h3>
+        <p>The one undefined word. Roughly: good in itself, a perfection. Gödel never says what it
+        means — he only lays down rules it obeys. The argument is <em>whatever “positive” means, if
+        it behaves like this, then…</em></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="explorer">
+    <nav class="rail" aria-label="Systems">
+      <h2>The lineage</h2>
+      <ol id="rail" role="tablist" aria-orientation="vertical"></ol>
+    </nav>
+    <div class="panel" id="panel" role="tabpanel" aria-live="polite"></div>
+  </section>
+
+  <section class="compare">
+    <h2>All five at a glance</h2>
+    <p class="sub">Every row below has been machine-checked in Lean 4. The “axioms used” column is
+    what the proof actually consumes, which is not always what the system postulates.</p>
+    <div class="tscroll">
+      <table>
+        <thead><tr>
+          <th>System</th><th>Year</th><th>Status</th><th>Axioms used for T3</th>
+          <th>Frame needed</th><th>Modal collapse</th>
+        </tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer>
+    <p>The inconsistency was found in 2013 by the theorem prover LEO-II and reported by Christoph
+    Benzmüller and Bruno Woltzenlogel Paleo. Modal collapse is Sobel's, 1987. The emendations are
+    C. A. Anderson's (1990), Melvin Fitting's (2002) and Petr Hájek's (2002).</p>
+    <p>All five systems are formalised and certified in Lean 4 at
+    <a href="https://github.com/alozanoroble/godel-ontological-lean">alozanoroble/godel-ontological-lean</a>.</p>
+  </footer>
+</div>
+
+<div id="tip" role="tooltip" hidden></div>
+
+<script>
+const SYSTEMS = [
+{
+  id:"godel", name:"Gödel", who:"Kurt Gödel", year:"1970",
+  status:"Inconsistent", kind:"bad",
+  history:"Gödel's notes date from 1970, though he had circled the argument for decades. He showed them to Dana Scott, and the manuscript passed hand to hand for years before appearing in print — in the Collected Works in 1995, and as an appendix to Sobel's Logic and Theism in 2004. What follows is what Gödel actually wrote.",
+  groups:[
+    {t:"Definitions", items:[
+      {tag:"D1", f:"G(x) := ∀φ ( P(φ) → φ(x) )", g:"x has every positive property",
+       e:"To be God-like is to have every single positive property — not most of them, all of them. That is the entire content of the word here: maximal perfection, with “positive” left undefined."},
+      {tag:"D2", f:"φ ess x := ∀ψ ( ψ(x) → □∀y ( φ(y) → ψ(y) ) )", g:"φ necessarily carries everything x has", flaw:true,
+       e:"A property φ is an <em>essence</em> of x when φ pins x down: knowing something has φ tells you it has everything else x has, no matter how things had gone.|Now look at what this does <em>not</em> say. It never requires that x actually have φ. That omission is the bug, and everything below turns on it."},
+      {tag:"D3", f:"NE(x) := ∀φ ( φ ess x → □∃y φ(y) )", g:"every essence of x must be instantiated",
+       e:"x has <em>necessary existence</em> when every property that pins x down must be instantiated — something must have it, in every possible world, not merely in this one."}
+    ]},
+    {t:"Axioms", items:[
+      {tag:"A1", f:"P(¬φ) ↔ ¬P(φ)", g:"exactly one of φ and ¬φ is positive",
+       e:"For each property, exactly one of it and its negation counts as positive. If kindness is positive, unkindness is not; and if a property is not positive, its opposite is. No property sits on the fence.|This is strong, and Anderson later objected to precisely this."},
+      {tag:"A2", f:"( P(φ) ∧ □∀x ( φ(x) → ψ(x) ) ) → P(ψ)", g:"positivity travels upward",
+       e:"If φ is positive, and having φ necessarily forces you to have ψ, then ψ is positive too. Anything a perfection entails is itself a perfection."},
+      {tag:"A3", f:"P(G)", g:"being God-like is positive",
+       e:"Maximal perfection is itself one of the perfections. Without this the argument never starts, because Theorem 1 has nothing to apply to."},
+      {tag:"A4", f:"P(φ) → □P(φ)", g:"positivity is not accidental",
+       e:"What counts as a perfection does not depend on how the world happened to turn out. If a property is positive, it is positive in every possible world.|Later work identifies this axiom — the <em>rigidity</em> of positivity — as the one that drives modal collapse."},
+      {tag:"A5", f:"P(NE)", g:"necessary existence is a perfection",
+       e:"The load-bearing axiom, and the one philosophers argue about. It says that existing necessarily, rather than by accident, is itself a perfection.|It is also the axiom that detonates Gödel's version."}
+    ]},
+    {t:"Theorems", items:[
+      {tag:"T1", f:"P(φ) → ◇∃x φ(x)", g:"a positive property could be instantiated",
+       e:"Suppose a positive φ could not possibly be had by anything. Then “everything with φ also has ψ” is vacuously true for <em>every</em> ψ — there is nothing with φ to falsify it. A2 then makes every property positive, including both a property and its negation, which A1 forbids.|So a positive property must be possibly instantiated."},
+      {tag:"T2", f:"G(x) → G ess x", g:"God-likeness is a God-like being's essence",
+       e:"Anything a God-like being has must be positive: if it were not, A1 would make its negation positive, and a God-like being has every positive property — so it would have the negation too. By A4 those properties are positive everywhere, so being God-like carries everything else along."},
+      {tag:"T3", f:"□∃x G(x)", g:"necessarily, a God-like being exists",
+       e:"A3 and Theorem 1 give that a God-like being is <em>possible</em>. A5 gives it necessary existence; Theorem 2 makes its God-likeness its essence. Put together: if such a being is so much as possible, one necessarily exists.|That is the proof. It is also worthless, for the reason below."}
+    ]}
+  ],
+  flaw:{
+    h:"Where it breaks: the empty property",
+    p:["Take a property nothing has, anywhere, ever — call it <em>being a round square</em>. Ask whether it is an essence of <strong>you</strong>.",
+       "Check D2. Is everything you have necessarily implied by being a round square? Take any property you have, say being over a metre tall. Is every round square over a metre tall? <strong>Yes</strong> — vacuously, because there are no round squares to falsify it. The same reason “every unicorn in my kitchen is purple” is true.",
+       "That works for every property you have. So by Gödel's definition, being a round square is an essence of you. And of me. And of a God-like being — which, by A5, has necessary existence, and so demands that <em>every</em> one of its essences be instantiated in every possible world. Round squares must necessarily exist. They do not.",
+       "Contradictory premises prove anything, the intended conclusion included. This is not a bad argument. It is the absence of one."]
+  },
+  gain:null,
+  lose:"Everything. Forty-three years passed before anyone noticed — the flaw surfaced in 2013, when a routine consistency check, run before anyone tried to verify the proof, came back saying the premises had no model at all.",
+  facts:[["Axioms used for ⊥","A1, A2, A5"],["Frame needed","none — logic K"],["A3, A4","not needed"]]
+},
+{
+  id:"scott", name:"Scott", who:"Dana Scott", year:"1987",
+  status:"Consistent — but collapses", kind:"warn",
+  history:"Dana Scott saw Gödel's notes and wrote out his own version, which is the one that circulated and which most of the literature actually analyses. His notes are printed alongside Gödel's in Sobel's Logic and Theism. The two differ in one conjunct, in one definition.",
+  groups:[
+    {t:"The one change", items:[
+      {tag:"D2", f:"φ ess x := φ(x) ∧ ∀ψ ( ψ(x) → □∀y ( φ(y) → ψ(y) ) )", g:"…and x actually has φ",
+       e:"Four words: <strong>x has φ</strong>. That is the entire difference between Gödel's system and Scott's.|It works because you are not a round square. The empty property is now an essence of nothing, so Gödel's contradiction has no first step. Everything else is unchanged."}
+    ]},
+    {t:"Everything else, unchanged", items:[
+      {tag:"D1", f:"G(x) := ∀φ ( P(φ) → φ(x) )", g:"x has every positive property", e:"Unchanged from Gödel."},
+      {tag:"D3", f:"NE(x) := ∀φ ( φ ess x → □∃y φ(y) )", g:"every essence of x must be instantiated", e:"Unchanged in form — but “essence” now means Scott's essence, which is what makes the difference."},
+      {tag:"A1–A5", f:"as Gödel", g:"the five axioms are untouched", e:"Scott changed nothing in the axioms. The whole repair is the conjunct in D2."}
+    ]},
+    {t:"Theorems", items:[
+      {tag:"T1", f:"P(φ) → ◇∃x φ(x)", g:"a positive property could be instantiated", e:"As before, from A1 and A2. No frame condition."},
+      {tag:"T2", f:"G(x) → G ess x", g:"God-likeness is a God-like being's essence", e:"Now provable properly, with the conjunct in place. Uses A1 and A4."},
+      {tag:"T3", f:"□∃x G(x)", g:"necessarily, a God-like being exists",
+       e:"The argument goes through as Gödel intended. It needs <strong>symmetry</strong> of the accessibility relation — the modal logic B — not the full S5 in which it is usually presented."},
+      {tag:"MC", f:"p → □p", g:"modal collapse — every truth is necessary", flaw:true,
+       e:"And here is the bill. Take any sentence p that is true, and treat “being such that p” as a property. A God-like being has it; by Theorem 2 its God-likeness necessarily carries it along; and by Theorem 3 there is a God-like being at every accessible world. So p holds everywhere.|You had lunch today, so you <em>necessarily</em> had lunch today and could not have done otherwise. Nothing is contingent."}
+    ]}
+  ],
+  diff:{h:"What changed", p:["One conjunct: <span class='mono'>φ(x) ∧</span> at the front of the definition of essence. Nothing else."]},
+  gain:"Consistency. The empty property is an essence of nothing, Gödel's contradiction has no first step, and the argument reaches its conclusion honestly.",
+  lose:"Modal collapse. Read as a condition on the frame it is starker still: the axioms force every world to see only itself. The argument is conducted in a language about what might have been, and its own premises leave that language with nothing to say.",
+  facts:[["Frame for T3","symmetry — logic B"],["Modal collapse","yes"],["Found by","Sobel, 1987"]]
+},
+{
+  id:"anderson", name:"Anderson", who:"C. A. Anderson", year:"1990",
+  status:"No collapse", kind:"ok",
+  history:"C. Anthony Anderson objected to the strength of A1 — the claim that for every property, one of it and its negation must be positive. He dropped half of it, and strengthened the two definitions to compensate. His disagreement with Hájek about which axioms are really doing work ran for over a decade.",
+  groups:[
+    {t:"Definitions, strengthened", items:[
+      {tag:"Gᴬ", f:"Gᴬ(x) := ∀φ ( P(φ) ↔ □φ(x) )", g:"the positive properties are exactly those x has necessarily",
+       e:"Gödel's God-like being has every positive property. Anderson's has <em>exactly</em> the positive properties, and has them <em>necessarily</em> — an arrow becomes a biconditional, and a box appears.|This is what compensates for the weakened A1."},
+      {tag:"essᴬ", f:"φ essᴬ x := ∀ψ ( □ψ(x) ↔ □∀y ( φ(y) → ψ(y) ) )", g:"φ entails exactly what x has necessarily",
+       e:"Essence becomes a biconditional too, and speaks only of what holds <em>necessarily</em>. That is why no merely contingent sentence can get a grip on it — which is exactly how the collapse is avoided."}
+    ]},
+    {t:"Axioms", items:[
+      {tag:"A1a", f:"P(¬φ) → ¬P(φ)", g:"only half of Gödel's A1",
+       e:"Anderson keeps only one direction: if a property's negation is positive, the property is not. He drops the converse — that a non-positive property must have a positive negation — as implausibly strong.|Dropping it alone would break the argument, which is why the definitions had to be strengthened."},
+      {tag:"A2", f:"( P(φ) ∧ □∀x ( φ(x) → ψ(x) ) ) → P(ψ)", g:"positivity travels upward", e:"Unchanged."},
+      {tag:"T2", f:"P(Gᴬ)", g:"God-likeness is positive — now postulated", e:"Anderson postulates this directly rather than deriving it, and drops Gödel's A3, which had no other purpose."},
+      {tag:"A4", f:"P(φ) → □P(φ)", g:"positivity is not accidental", e:"Unchanged."},
+      {tag:"A5", f:"P(NEᴬ)", g:"necessary existence is a perfection", e:"Unchanged in form, built on Anderson's essence."}
+    ]},
+    {t:"Theorems", items:[
+      {tag:"MT", f:"Gᴬ(x) ∧ Gᴬ(y) → x = y", g:"monotheism — God-like beings are unique",
+       e:"Something Scott's system cannot prove. Take the property of being identical to x: a God-like x has it necessarily, so it is positive, so any God-like y has it too. There is at most one.|The biconditional in the definition buys this."},
+      {tag:"T3", f:"□∃x Gᴬ(x)", g:"necessarily, a God-like being exists",
+       e:"It goes through — but it needs the full S5 package: reflexivity, transitivity <em>and</em> symmetry."},
+      {tag:"MC", f:"p → □p", g:"not derivable",
+       e:"A two-world model satisfies all of Anderson's axioms while leaving contingency intact. The collapse is genuinely avoided, not merely unproved."}
+    ]}
+  ],
+  diff:{h:"What changed", p:["A1 is halved; God-likeness and essence become biconditionals stated entirely in terms of <span class='mono'>□</span>."]},
+  gain:"Modal collapse is avoided, the most contentious half of A1 is gone, and the system proves something Scott's cannot: God-like beings are unique.",
+  lose:"Frame strength. Anderson's Theorem 3 needs full S5, where Scott's needed only symmetry. He pays <em>more</em> and still escapes the collapse — which is the clearest sign that frame strength is not what causes it.",
+  facts:[["Frame for T3","reflexive + transitive + symmetric — S5"],["Modal collapse","no"],["Bonus","monotheism"]]
+},
+{
+  id:"fitting", name:"Fitting", who:"Melvin Fitting", year:"2002",
+  status:"No collapse", kind:"ok",
+  history:"In Types, Tableaus, and Gödel's God, Melvin Fitting located the problem somewhere else entirely — not in the axioms or in essence, but in what “positive” applies to. Gödel worked in an intensional logic, where two properties can have exactly the same members and still count as different properties. Fitting asked what happens if positivity is a matter of the members alone.",
+  groups:[
+    {t:"The one change", items:[
+      {tag:"P", f:"P( S )   where S ⊆ individuals", g:"positivity applies to sets, not properties",
+       e:"In Gödel's and Scott's systems, “positive” applies to <em>properties</em>, which carry a different set of members in each possible world. In Fitting's, it applies to <em>extensions</em> — plain sets of individuals, fixed once and for all, with no world attached.|That single move is the whole variant."},
+      {tag:"G", f:"G(x) := ∀S ( P(S) → x ∈ S )", g:"x belongs to every positive set",
+       e:"God-likeness is now membership in every positive set, rather than possession of every positive property."}
+    ]},
+    {t:"Theorems", items:[
+      {tag:"T3", f:"□∃x G(x)", g:"necessarily, a God-like being exists — in K",
+       e:"Fitting's argument needs <strong>no frame condition at all</strong>. It runs in K, the weakest normal modal logic.|The reason is structural: his God-likeness is fixed by the positivity facts at one world, so a witness found at some other world is a witness full stop. Nothing has to be carried back — and carrying back is precisely what symmetry was buying in Scott's system."},
+      {tag:"MC", f:"p → □p", g:"not derivable",
+       e:"The collapse proof for Scott's system works by smuggling an arbitrary sentence p into the essence clause as a constant <em>property</em> — one that tracks p from world to world.|A set has no world to track. There is no extension that varies with p, so the substitution has no counterpart and the derivation simply stops."}
+    ]}
+  ],
+  diff:{h:"What changed", p:["Positivity moves from properties to sets. Essence and necessary existence follow it."]},
+  gain:"No frame condition whatsoever — the weakest modal logic suffices — and the collapse proof has nothing to substitute. It is the cleanest diagnosis of the four: the collapse rode in on the intensional reading.",
+  lose:"The intensional reading of “positive”. Gödel deliberately worked with properties, not sets, and did not assume that properties with the same members are the same property. Fitting's positivity cannot tell them apart.",
+  facts:[["Frame for T3","none — logic K"],["Modal collapse","no"],["Positivity applies to","extensions"]]
+},
+{
+  id:"hajek", name:"Hájek", who:"Petr Hájek", year:"2002",
+  status:"No collapse", kind:"ok",
+  history:"Petr Hájek's “small emendation” merges two of Gödel's axioms into one weaker one and rebuilds God-likeness on top of it. He and Anderson disagreed for years over which axioms were doing real work; a machine-assisted study in 2017 settled several of the disputed points — including one that surprised everyone.",
+  groups:[
+    {t:"Two axioms become one", items:[
+      {tag:"H:A12", f:"( P(φ) ∧ □∀x ( φ(x) → ψ(x) ) ) → ¬P(¬ψ)", g:"a weaker axiom doing the work of A1 and A2",
+       e:"Gödel's A1 is recovered as the special case ψ = φ. But A2 is <em>not</em> assumed: the conclusion is only that ¬ψ fails to be positive, not that ψ is positive.|Strictly less is claimed, and the argument still runs."},
+      {tag:"P#", f:"P#(φ) := ∃ψ ( P(ψ) ∧ □∀y ( ψ(y) → φ(y) ) )", g:"φ is necessarily implied by something positive",
+       e:"A derived notion, one step weaker than positivity itself: not “φ is a perfection”, but “some perfection forces φ”."},
+      {tag:"Gᴴ", f:"Gᴴ(x) := ∀φ ( □φ(x) ↔ P#(φ) )", g:"x necessarily has exactly what perfection forces",
+       e:"God-likeness is now built on P# rather than on P directly. This is the move that makes two of his own axioms redundant."}
+    ]},
+    {t:"Theorems", items:[
+      {tag:"T3", f:"□∃x Gᴴ(x)", g:"from H:A12 and A3 alone", flaw:false,
+       e:"Here is the surprise. Gᴴ is positive by A3, so it is trivially necessarily implied by a positive property — itself. The biconditional then converts that straight into <span class='mono'>□Gᴴ(g)</span>: the God-like being is <em>necessarily</em> God-like, immediately.|Where Scott needs A5 and a whole essence argument to make God-like existence necessary, Hájek's definition hands it over. <strong>A4 and A5 are never used.</strong>"},
+      {tag:"MC", f:"p → □p", g:"not derivable",
+       e:"As with Anderson, Gᴴ is stated entirely in terms of <span class='mono'>□</span>, so a merely contingent sentence never reaches the biconditional."}
+    ]}
+  ],
+  diff:{h:"What changed", p:["A1 and A2 merge into one weaker axiom; God-likeness is rebuilt on “necessarily implied by something positive” rather than on positivity itself."]},
+  gain:"Two axioms for the price of one — and Theorem 3 turns out to need only two of his four axioms. A4 and A5 are <em>superfluous</em>: the definition of God-likeness does the work Axiom 5 was written to do.",
+  lose:"Directness. God-likeness is now two definitions deep, and A4 and A5 stay in the system despite being unused — superfluous without being redundant, which is its own kind of untidiness.",
+  facts:[["Axioms used for T3","H:A12, A3 only"],["Frame for T3","symmetry — logic B"],["Modal collapse","no"]]
+}
+];
+
+const TABLE = [
+  ["Gödel","1970","Inconsistent","bad","—","none (K)","n/a"],
+  ["Scott","1987","Consistent","warn","all five","symmetry (B)","yes"],
+  ["Anderson","1990","Consistent","ok","all","refl + trans + symm (S5)","no"],
+  ["Fitting","2002","Consistent","ok","all","none (K)","no"],
+  ["Hájek","2002","Consistent","ok","2 of 4","symmetry (B)","no"]
+];
+
+const rail = document.getElementById('rail');
+const panel = document.getElementById('panel');
+const tip = document.getElementById('tip');
+let current = 0;
+
+function esc(s){ return s; }
+
+function render(i){
+  current = i;
+  const s = SYSTEMS[i];
+  let h = '';
+  h += '<div class="phead">';
+  h += '<span class="badge '+s.kind+'">'+s.status+'</span>';
+  h += '<h2>'+s.who+' <span>'+s.year+'</span></h2>';
+  h += '<p class="history">'+s.history+'</p></div>';
+
+  h += '<p class="hint"><span class="kbd">click</span> any line for a plain-English explanation'+
+       '<span style="color:var(--line)">·</span> the one-line gloss is always shown</p>';
+
+  s.groups.forEach(function(g){
+    h += '<div class="grouphead">'+g.t+'</div><div class="items">';
+    g.items.forEach(function(it, j){
+      const id = s.id+'-'+g.t.replace(/\W/g,'')+'-'+j;
+      h += '<div class="item'+(it.flaw?' flawed':'')+'">';
+      h += '<button class="itembtn" aria-expanded="false" aria-controls="'+id+'" data-ex="'+
+           encodeURIComponent(it.e)+'">';
+      h += '<span class="tag">'+it.tag+'</span>';
+      h += '<span><span class="formal">'+it.f+'</span><span class="gloss">'+it.g+'</span></span>';
+      h += '</button>';
+      h += '<div class="explain" id="'+id+'" hidden>'+
+           it.e.split('|').map(function(p){return '<p>'+p+'</p>';}).join('')+'</div>';
+      h += '</div>';
+    });
+    h += '</div>';
+  });
+
+  if(s.flaw){
+    h += '<div class="callout flaw"><h3>'+s.flaw.h+'</h3>'+
+         s.flaw.p.map(function(p){return '<p>'+p+'</p>';}).join('')+'</div>';
+  }
+  if(s.diff){
+    h += '<div class="callout diff"><h3>'+s.diff.h+'</h3>'+
+         s.diff.p.map(function(p){return '<p>'+p+'</p>';}).join('')+'</div>';
+  }
+
+  h += '<div class="ledger">';
+  h += '<div class="led gain"><h4>Gained</h4><p>'+(s.gain||'Nothing — the axioms prove everything, which is the same as proving nothing.')+'</p></div>';
+  h += '<div class="led lose"><h4>Lost</h4><p>'+s.lose+'</p></div>';
+  h += '</div>';
+
+  h += '<dl class="facts">';
+  s.facts.forEach(function(f){
+    h += '<div class="fact"><dt>'+f[0]+'</dt><dd>'+f[1]+'</dd></div>';
+  });
+  h += '</dl>';
+
+  panel.innerHTML = h;
+  Array.prototype.forEach.call(rail.querySelectorAll('.sysbtn'), function(b, k){
+    b.setAttribute('aria-selected', k===i ? 'true' : 'false');
+  });
+  hideTip();
+}
+
+// rail
+SYSTEMS.forEach(function(s, i){
+  const li = document.createElement('li');
+  li.innerHTML = '<button class="sysbtn" role="tab" aria-selected="false">'+
+    '<span class="yr">'+s.year+'</span><span class="nm">'+s.name+'</span></button>';
+  li.querySelector('button').addEventListener('click', function(){ render(i); });
+  rail.appendChild(li);
+});
+
+// table
+document.getElementById('tbody').innerHTML = TABLE.map(function(r){
+  return '<tr><td class="nm">'+r[0]+'</td><td class="yr">'+r[1]+'</td>'+
+    '<td><span class="pill '+r[3]+'">'+r[2]+'</span></td>'+
+    '<td class="m">'+r[4]+'</td><td class="m">'+r[5]+'</td><td class="m">'+r[6]+'</td></tr>';
+}).join('');
+
+// click to expand
+panel.addEventListener('click', function(e){
+  const btn = e.target.closest('.itembtn');
+  if(!btn) return;
+  const open = btn.getAttribute('aria-expanded') === 'true';
+  btn.setAttribute('aria-expanded', open ? 'false' : 'true');
+  document.getElementById(btn.getAttribute('aria-controls')).hidden = open;
+  if(!open) hideTip();
+});
+
+// hover preview (fine pointers only, never on touch)
+const canHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+let tipTimer = null;
+
+function showTip(btn){
+  if(btn.getAttribute('aria-expanded') === 'true') return;
+  const txt = decodeURIComponent(btn.dataset.ex || '');
+  if(!txt) return;
+  tip.innerHTML = txt.split('|').map(function(p){return '<p style="margin:0 0 8px">'+p+'</p>';}).join('')
+                  .replace(/margin:0 0 8px">([^]*)<\/p>$/, 'margin:0">$1</p>');
+  tip.hidden = false;
+  const r = btn.getBoundingClientRect();
+  const w = Math.min(380, window.innerWidth - 32);
+  tip.style.width = w + 'px';
+  let left = Math.min(r.left + 60, window.innerWidth - w - 16);
+  tip.style.left = Math.max(16, left) + 'px';
+  const th = tip.offsetHeight;
+  let top = r.bottom + 8;
+  if(top + th > window.innerHeight - 12) top = Math.max(12, r.top - th - 8);
+  tip.style.top = top + 'px';
+  tip.classList.add('show');
+}
+function hideTip(){
+  clearTimeout(tipTimer);
+  tip.classList.remove('show');
+  tipTimer = setTimeout(function(){ tip.hidden = true; }, 140);
+}
+if(canHover){
+  panel.addEventListener('mouseover', function(e){
+    const btn = e.target.closest('.itembtn');
+    if(!btn) return;
+    clearTimeout(tipTimer);
+    tipTimer = setTimeout(function(){ showTip(btn); }, 260);
+  });
+  panel.addEventListener('mouseout', function(e){
+    if(e.target.closest('.itembtn')) hideTip();
+  });
+  window.addEventListener('scroll', hideTip, {passive:true});
+}
+
+render(0);
+</script>
