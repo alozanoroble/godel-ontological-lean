@@ -11,7 +11,7 @@ derives `False` from it.
 The inconsistency was discovered in 2013 by the higher-order theorem prover
 Leo-II and reported by Christoph Benzmüller and Bruno Woltzenlogel Paleo,
 *The inconsistency in Gödel's ontological argument: a success story for AI in
-metaphysics*, IJCAI-16, p. 936.  What is formalised below is their informal
+metaphysics*, IJCAI-16, pp. 936–942.  What is formalised below is their informal
 argument (their §4.1), which they also reconstructed in Isabelle/HOL.  It is
 their result, not a new one; this is a Lean 4 rendering of it.
 
@@ -42,7 +42,7 @@ empty property.  Since nothing does, at any world, this says exactly that *no
 world at all is accessible from* `v`.  But Axiom 5 and Theorem 1 hold at `v`
 too, and together they produce an accessible world.  Contradiction.
 
-Scott's 1987 variant adds the single conjunct `φ(x)` to the definition of
+Scott's variant (c. 1972) adds the single conjunct `φ(x)` to the definition of
 essence.  That one conjunct is exactly what blocks this: see
 `empty_not_scottEss` at the end of the file.
 

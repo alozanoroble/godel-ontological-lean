@@ -43,7 +43,8 @@ def dia (r : W → W → Prop) (p : Sentence W) : Sentence W :=
   fun w => ∃ v, r w v ∧ p v
 
 /-- Symmetry of the accessibility relation: the frame condition for the modal
-logic `B` (and hence for `S5`).  This is the one frame condition the positive
+logic `KB` (K plus symmetry; note that the logic usually called `B` is `KTB`,
+which also assumes reflexivity).  This is the one frame condition the positive
 argument of `Godel.Scott` actually needs. -/
 def Symm (r : W → W → Prop) : Prop := ∀ w v, r w v → r v w
 

@@ -13,6 +13,12 @@ accordingly.
     Scott:    G(x)  :=  ∀ φ : I → W → Prop,  P φ → φ(x)
     Fitting:  G(x)  :=  ∀ S : I → Prop,      P S → S x
 
+**Read that carefully.**  What loses its world argument is the *extension* `S`,
+not positivity.  `P` here still has type `Ext I → Sentence W`, so whether a
+given set counts as positive may still vary from world to world unless `A4`
+pins it down.  "Positivity applies to world-independent sets" is the accurate
+statement; "positivity is fixed once and for all" is not.
+
 ## Why that blocks modal collapse
 
 The collapse proof for Scott's system takes an arbitrary sentence `p` and
@@ -116,6 +122,8 @@ structure AxI (r : W → W → Prop) (Ex : I → W → Prop)
   A1a : ∀ (w : W) (S : Ext I), P (enot S) w → ¬ P S w
   A1b : ∀ (w : W) (S : Ext I), ¬ P S w → P (enot S) w
   A2  : ∀ (w : W) (S T : Ext I), P S w → Entails r Ex S T w → P T w
+  /-- Fitting's own label (Proposition 11.16), **postulated** here rather than
+  derived; it plays the role of Gödel's `A3` for the extensional reading. -/
   T2  : ∀ w : W, P (godExt P w) w
 
 /-- **The full axiom set**, adding `A4` and `A5`. -/

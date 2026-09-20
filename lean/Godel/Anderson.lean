@@ -20,30 +20,48 @@ God-likeness becomes a biconditional — the positive properties are *exactly*
 the ones `x` has necessarily — and essence likewise. Necessary existence is
 unchanged except for using `essᴬ`.
 
-## What this buys, and what it costs
+## What this buys
 
-The biconditional in `Gᴬ` is strong enough to make God-like individuals
-unique (`monotheism` below), which is not a theorem of Scott's system. It also
-makes God-likeness *stable* across accessible worlds (`god_transfers`), and
-that is what carries the essence argument.
+The biconditional in `Gᴬ` makes God-like individuals unique (`monotheism`
+below) by a particularly direct route, and makes God-likeness *stable* across
+accessible worlds (`god_transfers`), which is what carries the essence
+argument.
 
-The cost is the frame: unlike Fitting's variant, which runs in `K`, Anderson's
-needs the full `S5` package — reflexivity, transitivity and symmetry are all
-used, exactly as in the Isabelle formalization this follows.
+Uniqueness is **not** peculiar to Anderson: `Godel.scott_monotheism` proves it
+for Scott's system from `A1b` alone, with no frame condition at all. An earlier
+version of this file claimed otherwise, and was wrong.
 
-What it avoids is modal collapse: `noCollapse` gives a two-world `S5` model of
-all the axioms in which collapse fails. The reason is that `Gᴬ` and `essᴬ`
-speak only of what holds *necessarily*, so the essence clause never gets a
-grip on a merely contingent sentence.
+What Anderson avoids is modal collapse: `noCollapse` gives a two-world `S5`
+model of all the axioms in which collapse fails. The reason is that `Gᴬ` and
+`essᴬ` speak only of what holds *necessarily*, so the essence clause never gets
+a grip on a merely contingent sentence.
+
+## A warning about the frame hypotheses below
+
+The derivations in this file assume reflexivity, transitivity **and** symmetry.
+**Those hypotheses are not minimal, and nothing here shows that they are.**
+
+- Anderson himself (1990, footnote 5) notes that the weaker logic `B` suffices
+  for Theorem 3.
+- Benzmüller, Weber and Woltzenlogel Paleo (*Logica Universalis* 11, 2017)
+  report `T3` automated in `KB` for Anderson's emendation, and further report
+  `A4` and `A5` to be **redundant** there — derivable from the rest, `A4` in
+  `K4B` and `A5` already in `K`.
+
+So the right reading of every hypothesis below is *"what this particular Lean
+derivation consumes"*, never *"what Anderson's system requires"*. Tightening
+these proofs towards `KB`, and deriving `A4`/`A5` rather than postulating them,
+is open work in this development.
 
 ## Simplification
 
 This file uses constant domains (possibilist quantifiers), where Anderson's
-argument is normally presented with an existence predicate. For Anderson —
-unlike Fitting, see `Godel.Fitting` — that costs nothing structural, because
-his God-likeness is intensional: `∃x Gᴬ(x)` still varies from world to world,
-so Theorem 1 still delivers merely possible existence and `A5` still does real
-work.
+argument is normally presented with an existence predicate. That is a
+substantive choice, not a free one: domain semantics was itself a central point
+in the Anderson–Hájek dispute, and the 2017 study finds that redundancy results
+and even the validity of `T3` in a mixed variant depend on it. Read this file
+as one reconstruction among several, not as evidence that the choice does not
+matter.
 
 Following Benzmüller and Fuenmayor, arXiv:1910.08955, and the AFP entry
 *Types, Tableaus and Gödel's God in Isabelle/HOL*, which in turn follow
@@ -73,12 +91,18 @@ def Ess (r : W → W → Prop) (φ : Property I W) (x : I) : Sentence W :=
 def NE (r : W → W → Prop) : Property I W :=
   fun x w => ∀ φ : Property I W, Ess r φ x w → box r (fun v => ∃ y, φ y v) w
 
-/-- Anderson's axioms.  `A1b` is gone; `A3` is replaced by `T2`, which
-postulates that God-likeness is positive. -/
+/-- Anderson's axioms.  `A1b` is gone; Gödel's `A3` is replaced by `A3p`,
+which **postulates** that the revised God-likeness `Gᴬ` is positive.
+
+A note on the name.  Anderson's own paper numbers this Axiom 3*; Fitting's
+presentation — which the AFP development and this file follow — reaches it as
+Proposition 11.16 and labels the corresponding Isabelle field `T2`.  It is
+postulated here, not derived, so `T2` would be actively misleading and `A3p`
+is used instead. -/
 structure Ax (r : W → W → Prop) (P : Property I W → Sentence W) : Prop where
   A1a : AxiomA1 P
   A2  : AxiomA2 r P
-  T2  : ∀ w : W, P (God r P) w
+  A3p : ∀ w : W, P (God r P) w
   A4  : ∀ (w : W) (φ : Property I W), P φ w → box r (P φ) w
   A5  : ∀ w : W, P (NE r) w
 
@@ -96,7 +120,10 @@ unique at a world.  Take the property of being identical to `x`: `x` has it
 necessarily, so it is positive, so any God-like `y` has it necessarily too,
 and reflexivity brings that down to the world itself.
 
-This is not a theorem of Scott's system. -/
+Uniqueness is *not* peculiar to Anderson — see `Godel.scott_monotheism`, which
+gets it for Scott's system from `A1b` alone and needs no frame condition.  What
+Anderson's biconditional buys is directness, not the result.  Reflexivity here
+is what *this* proof uses; it is not shown to be necessary. -/
 theorem monotheism (hrefl : ∀ w : W, r w w) {x y : I} {w : W}
     (hx : God r P x w) (hy : God r P y w) : y = x :=
   ((hy (fun z _ => z = x)).1
@@ -144,12 +171,17 @@ theorem box_exists_of_god (hrefl : ∀ w : W, r w w) (hsymm : Symm r)
 
 /-- **Theorem 3.**  Necessarily, a God-like individual exists.
 
-Needs the full `S5` package, unlike Fitting's variant
-(`Godel.Fitting.T3`), which needs no frame condition at all. -/
+**This derivation** assumes reflexivity, transitivity and symmetry.  Those are
+the hypotheses *this proof* consumes — they are **not** minimal and are not a
+property of Anderson's system.  Anderson (1990, fn. 5) notes that `B` suffices;
+Benzmüller, Weber and Woltzenlogel Paleo (2017) report `T3` automated in `KB`
+and `A4`, `A5` redundant.  Reaching `KB` here would need a different route:
+`god_transfers` uses transitivity and `box_exists_of_god` uses reflexivity, and
+neither is avoidable in the present argument.  Open work. -/
 theorem T3 (hrefl : ∀ w : W, r w w) (hsymm : Symm r)
     (htrans : ∀ a b c : W, r a b → r b c → r a c) (h : Ax r P) (w : W) :
     box r (fun v => ∃ x, God r P x v) w := by
-  obtain ⟨v, hwv, g, hg⟩ := T1 h (God r P) w (h.T2 w)
+  obtain ⟨v, hwv, g, hg⟩ := T1 h (God r P) w (h.A3p w)
   intro u hwu
   exact box_exists_of_god hrefl hsymm htrans h hg u
     (htrans v w u (hsymm w v hwv) hwu)
@@ -173,7 +205,7 @@ def cP : Property Unit Bool → Sentence Bool := fun φ _ => ∀ v, φ () v
 theorem noCollapse_axioms : Ax (univ : Bool → Bool → Prop) cP where
   A1a := fun _w _φ hn hp => (hn false) (hp false)
   A2  := fun _w _φ _ψ hφ hb v => hb v trivial () (hφ v)
-  T2  := fun _w _v _φ => ⟨fun h u _ => h u, fun h u => h u trivial⟩
+  A3p := fun _w _v _φ => ⟨fun h u _ => h u, fun h u => h u trivial⟩
   A4  := fun _w _φ h _v _hv => h
   A5  := by
     intro _w _v φ hess u _hu

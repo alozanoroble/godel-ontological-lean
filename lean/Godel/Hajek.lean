@@ -47,7 +47,9 @@ no frame condition at all.
 
 ## Frame conditions
 
-`T3` needs **symmetry** and nothing else, for the same reason as Scott's:
+`T3` needs **symmetry** and nothing else -- the modal logic `KB` (K plus
+symmetry; the logic usually written `B` is `KTB`, which also assumes
+reflexivity) -- for the same reason as Scott's:
 carrying the conclusion from a merely possible world back to the actual one.
 Everything before that step is frame-free.
 
@@ -80,7 +82,9 @@ structure AxCore (r : W → W → Prop) (P : Property I W → Sentence W) : Prop
   /-- **H:A12.**  Merges Anderson's `A1a` and `A2` into one weaker axiom. -/
   A12 : ∀ (w : W) (φ ψ : Property I W),
     P φ w → box r (fun v => ∀ x, φ x v → ψ x v) w → ¬ P (pneg ψ) w
-  /-- **A3.**  Being God-like is positive. -/
+  /-- **A3** (written `A3′` in the literature, to distinguish it from
+  Gödel's `A3`, since it is stated for Hájek's own `Gᴴ`).  Being God-like is
+  positive. -/
   A3 : ∀ w : W, P (God r P) w
 
 /-- Hájek's `AOE` in full.  `A4` and `A5` are stated for faithfulness and are

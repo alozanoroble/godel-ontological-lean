@@ -240,33 +240,44 @@ img{ max-width: 100%; }
   <header class="mast">
     <div class="eyebrow">Modal logic · 1970 – 2002</div>
     <h1>Gödel's God</h1>
-    <p class="standfirst">Kurt Gödel left a proof of God's existence in his notes: five axioms, three
-    definitions, three theorems. It is also <em>self-contradictory</em> — and nobody noticed for
-    forty-three years. Here is every line of it, what went wrong, and the four repairs.</p>
+    <p class="standfirst">Kurt Gödel left a formal ontological argument in his 1970 notes: five axioms,
+    three definitions, three theorems. But the axioms and definitions of that original version are
+    <em>inconsistent</em> — a fact nobody noticed until 2013. Here is the argument line by line,
+    what went wrong, and four influential repairs.</p>
   </header>
 
   <section class="primer">
-    <h2>Three words you need first</h2>
+    <h2>Four words you need first</h2>
     <div class="primer-grid">
       <div class="pcard">
         <span class="glyph mono">□ p &nbsp; ◇ p</span>
         <h3>Possible worlds</h3>
-        <p>To make “must” and “could” precise, imagine a catalogue of complete ways reality might
-        have gone. Ours is one entry. <span class="mono">□p</span> means p holds in every entry;
-        <span class="mono">◇p</span> means in at least one.</p>
+        <p>Imagine possible worlds together with a relation saying which are <em>accessible</em>
+        from which. At a world <span class="mono">w</span>, <span class="mono">□p</span> means p
+        holds at every world accessible from <span class="mono">w</span>;
+        <span class="mono">◇p</span> means at least one. Different conditions on that relation
+        give different modal logics — which is what the “frame” column below records.</p>
       </div>
       <div class="pcard">
         <span class="glyph mono">φ, ψ</span>
         <h3>Properties</h3>
-        <p>Anything a thing can be — tall, kind, prime. The argument quantifies over <em>all</em>
-        properties, and over properties of properties, so keep the two levels apart.</p>
+        <p>Anything a thing can be — tall, kind, prime. The system quantifies over properties in
+        its higher-order domain, and positivity is a predicate <em>of</em> properties, so keep the
+        two levels apart.</p>
       </div>
       <div class="pcard">
         <span class="glyph mono">P(φ)</span>
         <h3>Positive</h3>
-        <p>The one undefined word. Roughly: good in itself, a perfection. Gödel never says what it
-        means — he only lays down rules it obeys. The argument is <em>whatever “positive” means, if
-        it behaves like this, then…</em></p>
+        <p>The primitive notion. Gödel suggested readings — “positive in the moral–aesthetic
+        sense”, or pure attribution without privation — but never formally defined it. The
+        argument only lays down axioms governing&nbsp;<span class="mono">P</span>.</p>
+      </div>
+      <div class="pcard">
+        <span class="glyph mono">p → □p</span>
+        <h3>Modal collapse</h3>
+        <p>Every truth is a necessary truth: nothing could have been otherwise, and contingency
+        vanishes. Not an axiom — a <em>consequence</em> of Scott's system, and the objection each
+        later variant is built to escape.</p>
       </div>
     </div>
   </section>
@@ -281,23 +292,43 @@ img{ max-width: 100%; }
 
   <section class="compare">
     <h2>All five at a glance</h2>
-    <p class="sub">Every row below has been machine-checked in Lean 4. The “axioms used” column is
-    what the proof actually consumes, which is not always what the system postulates.</p>
+    <p class="sub">The Lean theorems behind these rows are machine-checked. The “axioms used” and
+    “frame” columns describe <strong>what the current Lean derivation consumes</strong> — they do
+    not show those assumptions are minimal, and where the literature proves something sharper the
+    row says so. Sources: <a href="https://github.com/alozanoroble/godel-ontological-lean/tree/main/lean/Godel">the
+    Lean files</a>.</p>
     <div class="tscroll">
       <table>
         <thead><tr>
           <th>System</th><th>Year</th><th>Status</th><th>Axioms used for T3</th>
-          <th>Frame needed</th><th>Modal collapse</th>
+          <th>Frame (this proof)</th><th>Modal collapse</th><th>Uniqueness</th>
         </tr></thead>
         <tbody id="tbody"></tbody>
       </table>
     </div>
+
+    <div class="callout diff" style="margin-top:28px">
+      <h3>What Lean verifies — and what it doesn't</h3>
+      <p>Lean checks <em>conditional</em> mathematics: given the definitions and assumptions
+      encoded here, the stated conclusions follow. It also certifies explicit countermodels and
+      contradictions. Every theorem in this development is a conditional, and
+      <span class="mono">#print axioms</span> reports only Lean's own three foundational axioms —
+      Gödel's never appear, because they are hypotheses, not postulates.</p>
+      <p>Three things Lean does <strong>not</strong> settle, and which are human work:
+      whether an encoding is historically faithful to its author; whether the hypotheses a
+      particular proof uses are logically <em>minimal</em>; and whether a theorem absent from the
+      development is actually unprovable. Conflating these is the easiest way to get this subject
+      wrong — and an earlier version of this page did, in both directions. Two errors it contained
+      are now corrected below and flagged where they occurred.</p>
+    </div>
   </section>
 
   <footer>
-    <p>The inconsistency was found in 2013 by the theorem prover LEO-II and reported by Christoph
-    Benzmüller and Bruno Woltzenlogel Paleo. Modal collapse is Sobel's, 1987. The emendations are
-    C. A. Anderson's (1990), Melvin Fitting's (2002) and Petr Hájek's (2002).</p>
+    <p>The inconsistency was automatically detected in 2013 by the prover LEO-II, then
+    reconstructed and verified by Christoph Benzmüller and Bruno Woltzenlogel Paleo. Sobel
+    identified modal collapse in 1987. The emendations are C. A. Anderson's (1990), Melvin
+    Fitting's (2002) and Petr Hájek's (2002); the comparative machine analysis of Anderson and
+    Hájek is Benzmüller, Weber and Woltzenlogel Paleo (2017).</p>
     <p>All five systems are formalised and certified in Lean 4 at
     <a href="https://github.com/alozanoroble/godel-ontological-lean">alozanoroble/godel-ontological-lean</a>.</p>
   </footer>
@@ -310,7 +341,7 @@ const SYSTEMS = [
 {
   id:"godel", name:"Gödel", who:"Kurt Gödel", year:"1970",
   status:"Inconsistent", kind:"bad",
-  history:"Gödel's notes date from 1970, though he had circled the argument for decades. He showed them to Dana Scott, and the manuscript passed hand to hand for years before appearing in print — in the Collected Works in 1995, and as an appendix to Sobel's Logic and Theism in 2004. What follows is what Gödel actually wrote.",
+  history:"Gödel's surviving manuscript is dated 1970, though his Nachlass shows he had worked on ontological arguments for many years. He showed notes to Dana Scott in the spring of 1970, and the argument circulated in manuscript before appearing in print — in the Collected Works in 1995, and as an appendix to Sobel's Logic and Theism in 2004. What follows is a modern formal reconstruction, not a transcription of Gödel's own notation.",
   groups:[
     {t:"Definitions", items:[
       {tag:"D1", f:"G(x) := ∀φ ( P(φ) → φ(x) )", g:"x has every positive property",
@@ -322,44 +353,44 @@ const SYSTEMS = [
     ]},
     {t:"Axioms", items:[
       {tag:"A1", f:"P(¬φ) ↔ ¬P(φ)", g:"exactly one of φ and ¬φ is positive",
-       e:"For each property, exactly one of it and its negation counts as positive. If kindness is positive, unkindness is not; and if a property is not positive, its opposite is. No property sits on the fence.|This is strong, and Anderson later objected to precisely this."},
+       e:"For each property, exactly one of it and its negation counts as positive. If kindness is positive, unkindness is not; and if a property is not positive, its opposite is. No property sits on the fence.|This is strong, and Anderson later objected to precisely this. Only the left-to-right half is needed for the contradiction."},
       {tag:"A2", f:"( P(φ) ∧ □∀x ( φ(x) → ψ(x) ) ) → P(ψ)", g:"positivity travels upward",
        e:"If φ is positive, and having φ necessarily forces you to have ψ, then ψ is positive too. Anything a perfection entails is itself a perfection."},
       {tag:"A3", f:"P(G)", g:"being God-like is positive",
-       e:"Maximal perfection is itself one of the perfections. Without this the argument never starts, because Theorem 1 has nothing to apply to."},
+       e:"This supplies the positive property that Theorem 1 is applied to in the intended existence argument.|It is <em>not</em> needed for the inconsistency below, which applies Theorem 1 to necessary existence directly."},
       {tag:"A4", f:"P(φ) → □P(φ)", g:"positivity is not accidental",
-       e:"What counts as a perfection does not depend on how the world happened to turn out. If a property is positive, it is positive in every possible world.|Later work identifies this axiom — the <em>rigidity</em> of positivity — as the one that drives modal collapse."},
+       e:"What counts as a perfection does not depend on how the world happened to turn out. If a property is positive, it is positive in every possible world.|This <em>rigidity</em> of positivity is an important ingredient in the standard derivation of modal collapse, working together with the definitions of essence and necessary existence. Later variants show the behaviour also depends on how properties and positivity are formalised at all.|Also not needed for the inconsistency."},
       {tag:"A5", f:"P(NE)", g:"necessary existence is a perfection",
-       e:"The load-bearing axiom, and the one philosophers argue about. It says that existing necessarily, rather than by accident, is itself a perfection.|It is also the axiom that detonates Gödel's version."}
+       e:"It says that existing necessarily, rather than by accident, is itself a perfection. This is the axiom philosophers argue about most.|It is one of the crucial assumptions in both the intended argument and the inconsistency — in the latter it works together with A1, A2 and Gödel's definitions of essence and necessary existence. It is necessary for the contradiction, not sufficient alone."}
     ]},
     {t:"Theorems", items:[
       {tag:"T1", f:"P(φ) → ◇∃x φ(x)", g:"a positive property could be instantiated",
        e:"Suppose a positive φ could not possibly be had by anything. Then “everything with φ also has ψ” is vacuously true for <em>every</em> ψ — there is nothing with φ to falsify it. A2 then makes every property positive, including both a property and its negation, which A1 forbids.|So a positive property must be possibly instantiated."},
       {tag:"T2", f:"G(x) → G ess x", g:"God-likeness is a God-like being's essence",
-       e:"Anything a God-like being has must be positive: if it were not, A1 would make its negation positive, and a God-like being has every positive property — so it would have the negation too. By A4 those properties are positive everywhere, so being God-like carries everything else along."},
+       e:"Within the intended derivation: anything a God-like being has must be positive, since otherwise A1 would make its negation positive and a God-like being would have that too. By A4 those properties are positive everywhere, so being God-like carries everything else along."},
       {tag:"T3", f:"□∃x G(x)", g:"necessarily, a God-like being exists",
-       e:"A3 and Theorem 1 give that a God-like being is <em>possible</em>. A5 gives it necessary existence; Theorem 2 makes its God-likeness its essence. Put together: if such a being is so much as possible, one necessarily exists.|That is the proof. It is also worthless, for the reason below."}
+       e:"A3 and Theorem 1 give that a God-like being is <em>possible</em>. A5 gives it necessary existence; Theorem 2 makes its God-likeness its essence. Put together: if such a being is so much as possible, one necessarily exists.|That is the intended derivation. But see below: because the premise set is inconsistent, deriving T3 from it cannot establish the conclusion."}
     ]}
   ],
   flaw:{
     h:"Where it breaks: the empty property",
-    p:["Take a property nothing has, anywhere, ever — call it <em>being a round square</em>. Ask whether it is an essence of <strong>you</strong>.",
-       "Check D2. Is everything you have necessarily implied by being a round square? Take any property you have, say being over a metre tall. Is every round square over a metre tall? <strong>Yes</strong> — vacuously, because there are no round squares to falsify it. The same reason “every unicorn in my kitchen is purple” is true.",
-       "That works for every property you have. So by Gödel's definition, being a round square is an essence of you. And of me. And of a God-like being — which, by A5, has necessary existence, and so demands that <em>every</em> one of its essences be instantiated in every possible world. Round squares must necessarily exist. They do not.",
-       "Contradictory premises prove anything, the intended conclusion included. This is not a bad argument. It is the absence of one."]
+    p:["Take the <strong>empty property</strong> — the property that, by definition, nothing has at any world. For intuition, think <em>being a round square</em>. Ask whether it is an essence of <strong>you</strong>.",
+       "Check D2. Is everything you have necessarily implied by having the empty property? Take any property you have, say being over a metre tall. Is every bearer of the empty property over a metre tall? <strong>Yes</strong> — vacuously, because there are no bearers to falsify it. The same reason “every unicorn in my kitchen is purple” is true.",
+       "That works for every property you have. So by Gödel's definition, the empty property is an essence of you. And of me. And of a God-like being — which, by A5, has necessary existence, and so requires that <em>every</em> one of its essences be instantiated in every possible world. The definition then demands that the empty property be necessarily instantiated, which is impossible.",
+       "Once the premises are inconsistent, derivability stops discriminating: in classical logic an inconsistent theory proves every formula, the intended conclusion included."]
   },
   gain:null,
-  lose:"Everything. Forty-three years passed before anyone noticed — the flaw surfaced in 2013, when a routine consistency check, run before anyone tried to verify the proof, came back saying the premises had no model at all.",
-  facts:[["Axioms used for ⊥","A1, A2, A5"],["Frame needed","none — logic K"],["A3, A4","not needed"]]
+  lose:"The inconsistency went unnoticed until 2013, when a routine consistency check — run before anyone attempted to verify the proof — reported that the premises had no model at all.",
+  facts:[["Axioms used for ⊥","A1a, A2, A5"],["Frame needed","none — logic K"],["A3, A4","not needed"]]
 },
 {
-  id:"scott", name:"Scott", who:"Dana Scott", year:"1987",
+  id:"scott", name:"Scott", who:"Dana Scott", year:"c. 1972",
   status:"Consistent — but collapses", kind:"warn",
-  history:"Dana Scott saw Gödel's notes and wrote out his own version, which is the one that circulated and which most of the literature actually analyses. His notes are printed alongside Gödel's in Sobel's Logic and Theism. The two differ in one conjunct, in one definition.",
+  history:"Gödel showed Scott notes on the argument in spring 1970. Scott soon presented a slightly modified version in a seminar; his handwritten notes are commonly dated 1972. Sobel published a detailed rendering in 1987, which is why the variant is often labelled with that year. It is Scott's version, not Gödel's, that most of the literature actually analyses — and the two differ in one conjunct, in one definition.",
   groups:[
     {t:"The one change", items:[
       {tag:"D2", f:"φ ess x := φ(x) ∧ ∀ψ ( ψ(x) → □∀y ( φ(y) → ψ(y) ) )", g:"…and x actually has φ",
-       e:"Four words: <strong>x has φ</strong>. That is the entire difference between Gödel's system and Scott's.|It works because you are not a round square. The empty property is now an essence of nothing, so Gödel's contradiction has no first step. Everything else is unchanged."}
+       e:"Four words: <strong>x has φ</strong>. In the standard reconstruction that is the decisive formal difference between Gödel's system and Scott's; the remaining axioms and definitions keep their form.|It works because you do not have the empty property. It is now an essence of nothing, so Gödel's contradiction has no first step."}
     ]},
     {t:"Everything else, unchanged", items:[
       {tag:"D1", f:"G(x) := ∀φ ( P(φ) → φ(x) )", g:"x has every positive property", e:"Unchanged from Gödel."},
@@ -368,22 +399,24 @@ const SYSTEMS = [
     ]},
     {t:"Theorems", items:[
       {tag:"T1", f:"P(φ) → ◇∃x φ(x)", g:"a positive property could be instantiated", e:"As before, from A1 and A2. No frame condition."},
-      {tag:"T2", f:"G(x) → G ess x", g:"God-likeness is a God-like being's essence", e:"Now provable properly, with the conjunct in place. Uses A1 and A4."},
+      {tag:"T2", f:"G(x) → G ess x", g:"God-likeness is a God-like being's essence", e:"Now provable properly, with the conjunct in place. Uses A1b and A4, and no frame condition."},
+      {tag:"MT", f:"G(x) ∧ G(y) → x = y", g:"monotheism — God-like beings are unique",
+       e:"Take the property of being identical to x. If it were not positive, A1b would make its negation positive, and a God-like x — having every positive property — would fail to be self-identical. So it is positive, and any God-like y has it.|Uses A1b alone: no frame condition, no A4, no A5. <strong>An earlier version of this page claimed uniqueness was unavailable in Scott's system. That was false</strong>, and <span class='mono'>Godel.scott_monotheism</span> in the Lean development is the correction."},
       {tag:"T3", f:"□∃x G(x)", g:"necessarily, a God-like being exists",
-       e:"The argument goes through as Gödel intended. It needs <strong>symmetry</strong> of the accessibility relation — the modal logic B — not the full S5 in which it is usually presented."},
+       e:"The argument goes through as Gödel intended. This derivation needs only <strong>symmetry</strong> of the accessibility relation — the normal modal logic <span class='mono'>KB</span> — not the full S5 in which the argument is usually presented.|(“B” on its own conventionally names <span class='mono'>KTB</span>, which also assumes reflexivity. Symmetry alone is <span class='mono'>KB</span>.)"},
       {tag:"MC", f:"p → □p", g:"modal collapse — every truth is necessary", flaw:true,
-       e:"And here is the bill. Take any sentence p that is true, and treat “being such that p” as a property. A God-like being has it; by Theorem 2 its God-likeness necessarily carries it along; and by Theorem 3 there is a God-like being at every accessible world. So p holds everywhere.|You had lunch today, so you <em>necessarily</em> had lunch today and could not have done otherwise. Nothing is contingent."}
+       e:"And here is the bill. For any proposition representable in the formal language: treat “being such that p” as a property. A God-like being has it; by Theorem 2 its God-likeness necessarily carries it along; and by Theorem 3 there is a God-like being at every accessible world. So p holds everywhere.|You had lunch today, so you <em>necessarily</em> had lunch today and could not have done otherwise. Nothing is contingent."}
     ]}
   ],
   diff:{h:"What changed", p:["One conjunct: <span class='mono'>φ(x) ∧</span> at the front of the definition of essence. Nothing else."]},
-  gain:"Consistency. The empty property is an essence of nothing, Gödel's contradiction has no first step, and the argument reaches its conclusion honestly.",
-  lose:"Modal collapse. Read as a condition on the frame it is starker still: the axioms force every world to see only itself. The argument is conducted in a language about what might have been, and its own premises leave that language with nothing to say.",
-  facts:[["Frame for T3","symmetry — logic B"],["Modal collapse","yes"],["Found by","Sobel, 1987"]]
+  gain:"Consistency. The empty-property contradiction is blocked and the intended derivation can be carried out without triviality. Note that consistency is not soundness: it says nothing about whether the axioms are true.",
+  lose:"Modal collapse. In this Kripke-semantic formalization, collapse together with Scott's axioms forces accessibility to reduce to identity — each world accesses only itself. The argument is conducted in a language about what might have been, and its own premises leave that language with nothing to say.",
+  facts:[["Frame for T3","symmetry — KB"],["Modal collapse","yes"],["Uniqueness","yes — from A1b alone"]]
 },
 {
   id:"anderson", name:"Anderson", who:"C. A. Anderson", year:"1990",
   status:"No collapse", kind:"ok",
-  history:"C. Anthony Anderson objected to the strength of A1 — the claim that for every property, one of it and its negation must be positive. He dropped half of it, and strengthened the two definitions to compensate. His disagreement with Hájek about which axioms are really doing work ran for over a decade.",
+  history:"C. Anthony Anderson objected to the strength of A1 — the claim that for every property, one of it and its negation must be positive. He dropped half of it, and strengthened the two definitions to compensate. His long disagreement with Hájek concerned whether A4 and A5 were redundant or merely superfluous, and how that depended on the treatment of quantifier domains.",
   groups:[
     {t:"Definitions, strengthened", items:[
       {tag:"Gᴬ", f:"Gᴬ(x) := ∀φ ( P(φ) ↔ □φ(x) )", g:"the positive properties are exactly those x has necessarily",
@@ -392,83 +425,88 @@ const SYSTEMS = [
        e:"Essence becomes a biconditional too, and speaks only of what holds <em>necessarily</em>. That is why no merely contingent sentence can get a grip on it — which is exactly how the collapse is avoided."}
     ]},
     {t:"Axioms", items:[
-      {tag:"A1a", f:"P(¬φ) → ¬P(φ)", g:"only half of Gödel's A1",
-       e:"Anderson keeps only one direction: if a property's negation is positive, the property is not. He drops the converse — that a non-positive property must have a positive negation — as implausibly strong.|Dropping it alone would break the argument, which is why the definitions had to be strengthened."},
+      {tag:"A1*", f:"P(φ) → ¬P(¬φ)", g:"only half of Gödel's A1",
+       e:"Anderson keeps one direction: if a property is positive, its negation is not. He drops the converse — that a non-positive property must have a positive negation — as implausibly strong.|Dropping it alone would break the argument, which is why the definitions had to be strengthened."},
       {tag:"A2", f:"( P(φ) ∧ □∀x ( φ(x) → ψ(x) ) ) → P(ψ)", g:"positivity travels upward", e:"Unchanged."},
-      {tag:"T2", f:"P(Gᴬ)", g:"God-likeness is positive — now postulated", e:"Anderson postulates this directly rather than deriving it, and drops Gödel's A3, which had no other purpose."},
-      {tag:"A4", f:"P(φ) → □P(φ)", g:"positivity is not accidental", e:"Unchanged."},
-      {tag:"A5", f:"P(NEᴬ)", g:"necessary existence is a perfection", e:"Unchanged in form, built on Anderson's essence."}
+      {tag:"A3*", f:"P(Gᴬ)", g:"the revised God-likeness is positive",
+       e:"This is Anderson's Axiom 3*: the revised property of being God-like* is positive. It plays the role Gödel's A3 played, for the revised definition.|Fitting's presentation reaches it as Proposition 11.16 and the Isabelle development labels it <span class='mono'>T2</span>; an earlier version of this page copied that label, which wrongly suggested a derived theorem. It is postulated."},
+      {tag:"A4", f:"P(φ) → □P(φ)", g:"positivity is not accidental",
+       e:"Anderson retains A4 and a revised A5*. But later computer-assisted analysis found <strong>both redundant</strong> for this emendation — derivable from the rest, A4 in K4B and A5 already in K — under the constant- and varying-domain semantics analysed."},
+      {tag:"A5*", f:"P(NEᴬ)", g:"necessary existence is a perfection", e:"Unchanged in form, built on Anderson's essence. See the note on A4: later analysis found it redundant here."}
     ]},
     {t:"Theorems", items:[
       {tag:"MT", f:"Gᴬ(x) ∧ Gᴬ(y) → x = y", g:"monotheism — God-like beings are unique",
-       e:"Something Scott's system cannot prove. Take the property of being identical to x: a God-like x has it necessarily, so it is positive, so any God-like y has it too. There is at most one.|The biconditional in the definition buys this."},
+       e:"Take the property of being identical to x: a God-like x has it necessarily, so it is positive, so any God-like y has it too. There is at most one.|The biconditional makes this especially direct — but uniqueness is <em>not</em> peculiar to Anderson. It is derivable in the Gödel/Scott setting too, and this page previously claimed otherwise in error."},
       {tag:"T3", f:"□∃x Gᴬ(x)", g:"necessarily, a God-like being exists",
-       e:"It goes through — but it needs the full S5 package: reflexivity, transitivity <em>and</em> symmetry."},
-      {tag:"MC", f:"p → □p", g:"not derivable",
+       e:"Anderson presents the final step using S5 but notes explicitly, in footnote 5 of the 1990 paper, that the weaker logic B suffices. Later computer-assisted analysis verifies T3 already in <span class='mono'>KB</span>.|<strong>The Lean derivation on this site uses reflexivity, transitivity and symmetry — stronger than necessary.</strong> That is a limitation of this formalization, not of Anderson's system, and an earlier version of this page wrongly reported it as a cost of the variant."},
+      {tag:"MC", f:"p → □p", g:"not entailed — here is a countermodel",
        e:"A two-world model satisfies all of Anderson's axioms while leaving contingency intact. The collapse is genuinely avoided, not merely unproved."}
     ]}
   ],
   diff:{h:"What changed", p:["A1 is halved; God-likeness and essence become biconditionals stated entirely in terms of <span class='mono'>□</span>."]},
-  gain:"Modal collapse is avoided, the most contentious half of A1 is gone, and the system proves something Scott's cannot: God-like beings are unique.",
-  lose:"Frame strength. Anderson's Theorem 3 needs full S5, where Scott's needed only symmetry. He pays <em>more</em> and still escapes the collapse — which is the clearest sign that frame strength is not what causes it.",
-  facts:[["Frame for T3","reflexive + transitive + symmetric — S5"],["Modal collapse","no"],["Bonus","monotheism"]]
+  gain:"Modal collapse is avoided, and the most contentious half of A1 is gone. The biconditional definitions also give a particularly direct route to uniqueness.",
+  lose:"Complexity in the definitions, and — on the published analysis — two axioms that turn out to be redundant. What is <em>not</em> a cost is frame strength: KB suffices, and the S5 used by this site's Lean proof is an artefact of that proof.",
+  facts:[["Frame for T3","symmetry — KB suffices"],["This Lean proof uses","refl + trans + symm (not minimal)"],["A4, A5*","reported redundant"],["Modal collapse","no"]]
 },
 {
   id:"fitting", name:"Fitting", who:"Melvin Fitting", year:"2002",
   status:"No collapse", kind:"ok",
-  history:"In Types, Tableaus, and Gödel's God, Melvin Fitting located the problem somewhere else entirely — not in the axioms or in essence, but in what “positive” applies to. Gödel worked in an intensional logic, where two properties can have exactly the same members and still count as different properties. Fitting asked what happens if positivity is a matter of the members alone.",
+  history:"In Types, Tableaus, and Gödel's God, Melvin Fitting diagnosed modal collapse as depending on the intensional treatment of properties. Gödel worked in an intensional logic, where two properties can have exactly the same members and still count as different properties. Fitting asked what happens when positivity is a matter of the members alone — and reformulated God-likeness, essence and necessary existence to match.",
   groups:[
-    {t:"The one change", items:[
+    {t:"The central move", items:[
       {tag:"P", f:"P( S )   where S ⊆ individuals", g:"positivity applies to sets, not properties",
-       e:"In Gödel's and Scott's systems, “positive” applies to <em>properties</em>, which carry a different set of members in each possible world. In Fitting's, it applies to <em>extensions</em> — plain sets of individuals, fixed once and for all, with no world attached.|That single move is the whole variant."},
+       e:"In Gödel's and Scott's systems, “positive” applies to <em>properties</em>, which carry a different set of members in each possible world. In Fitting's, it applies to <em>extensions</em> — plain sets of individuals, with no world parameter.|Careful: it is the <em>set</em> that loses its world, not positivity. Whether a given set counts as positive may still be evaluated at a world, unless A4 pins it down."},
       {tag:"G", f:"G(x) := ∀S ( P(S) → x ∈ S )", g:"x belongs to every positive set",
-       e:"God-likeness is now membership in every positive set, rather than possession of every positive property."}
+       e:"God-likeness is membership in every positive set, rather than possession of every positive property. Essence and necessary existence follow it."}
     ]},
     {t:"Theorems", items:[
-      {tag:"T3", f:"□∃x G(x)", g:"necessarily, a God-like being exists — in K",
-       e:"Fitting's argument needs <strong>no frame condition at all</strong>. It runs in K, the weakest normal modal logic.|The reason is structural: his God-likeness is fixed by the positivity facts at one world, so a witness found at some other world is a witness full stop. Nothing has to be carried back — and carrying back is precisely what symmetry was buying in Scott's system."},
-      {tag:"MC", f:"p → □p", g:"not derivable",
-       e:"The collapse proof for Scott's system works by smuggling an arbitrary sentence p into the essence clause as a constant <em>property</em> — one that tracks p from world to world.|A set has no world to track. There is no extension that varies with p, so the substitution has no counterpart and the derivation simply stops."}
+      {tag:"MT", f:"G(x) ∧ G(y) → x = y", g:"monotheism", e:"Provable here too, by the same route as in Scott's and Anderson's systems. Uniqueness is common to all three."},
+      {tag:"T3 de re", f:"□ ∃x ( E(x) ∧ G_w(x) )", g:"at every accessible world, an existing individual is God-like as read off here",
+       e:"God-likeness frozen at the world of evaluation. This needs <strong>no frame condition at all</strong> — it runs in K, the weakest normal modal logic.|The reason is structural: <span class='mono'>G_w</span> is fixed by the positivity facts at w, so a witness found at an accessible world is a witness full stop. Nothing has to be carried back — and carrying back is precisely what symmetry was buying in Scott's system."},
+      {tag:"T3 de dicto", f:"□ ∃x ( E(x) ∧ G(x) )", g:"at every accessible world, an existing individual is God-like there",
+       e:"The reading re-evaluated at each world. Also a theorem, also in K; the bridge from the de re version is A4, which makes God-likeness stable along accessibility.|The two readings <em>do</em> come apart earlier — on Fitting's Part I axioms, before A4 is available, God-like existence is de re possible but not de dicto possible. The Lean development includes that two-world countermodel."},
+      {tag:"MC", f:"p → □p", g:"not entailed — here is a countermodel",
+       e:"The collapse proof for Scott's system works by smuggling an arbitrary sentence p into the essence clause as a constant <em>property</em> — one that tracks p from world to world.|A set has no world to track. There is no extension that varies with p, so the substitution has no counterpart and that derivation stops."}
     ]}
   ],
-  diff:{h:"What changed", p:["Positivity moves from properties to sets. Essence and necessary existence follow it."]},
-  gain:"No frame condition whatsoever — the weakest modal logic suffices — and the collapse proof has nothing to substitute. It is the cleanest diagnosis of the four: the collapse rode in on the intensional reading.",
+  diff:{h:"What changed", p:["Positivity moves from properties to sets. Essence and necessary existence are reformulated to follow it."]},
+  gain:"No frame condition whatsoever — the weakest modal logic suffices — and the standard collapse derivation has nothing to substitute. It gives a particularly transparent diagnosis: that derivation depends critically on the intensional treatment of properties.",
   lose:"The intensional reading of “positive”. Gödel deliberately worked with properties, not sets, and did not assume that properties with the same members are the same property. Fitting's positivity cannot tell them apart.",
-  facts:[["Frame for T3","none — logic K"],["Modal collapse","no"],["Positivity applies to","extensions"]]
+  facts:[["Frame for T3","none — logic K"],["Modal collapse","no"],["Quantifiers","actualist, with an existence predicate"]]
 },
 {
   id:"hajek", name:"Hájek", who:"Petr Hájek", year:"2002",
   status:"No collapse", kind:"ok",
-  history:"Petr Hájek's “small emendation” merges two of Gödel's axioms into one weaker one and rebuilds God-likeness on top of it. He and Anderson disagreed for years over which axioms were doing real work; a machine-assisted study in 2017 settled several of the disputed points — including one that surprised everyone.",
+  history:"Petr Hájek's “small emendation” merges two of Gödel's axioms into one weaker one and rebuilds God-likeness on top of it. He and Anderson disagreed for years over which axioms were doing real work; a 2017 computer-assisted study clarified several of the disputed points and reported some unexpected results.",
   groups:[
     {t:"Two axioms become one", items:[
       {tag:"H:A12", f:"( P(φ) ∧ □∀x ( φ(x) → ψ(x) ) ) → ¬P(¬ψ)", g:"a weaker axiom doing the work of A1 and A2",
-       e:"Gödel's A1 is recovered as the special case ψ = φ. But A2 is <em>not</em> assumed: the conclusion is only that ¬ψ fails to be positive, not that ψ is positive.|Strictly less is claimed, and the argument still runs."},
+       e:"Taking ψ = φ recovers <strong>Anderson's weakened A1*</strong>, <span class='mono'>P(φ) → ¬P(¬φ)</span>. Gödel and Scott's stronger biconditional A1 is <em>not</em> recovered — an earlier version of this page said it was, which was wrong.|A2 is not assumed either: the conclusion is only that ¬ψ fails to be positive, not that ψ is positive. Strictly less is claimed, and the argument still runs."},
       {tag:"P#", f:"P#(φ) := ∃ψ ( P(ψ) ∧ □∀y ( ψ(y) → φ(y) ) )", g:"φ is necessarily implied by something positive",
        e:"A derived notion, one step weaker than positivity itself: not “φ is a perfection”, but “some perfection forces φ”."},
       {tag:"Gᴴ", f:"Gᴴ(x) := ∀φ ( □φ(x) ↔ P#(φ) )", g:"x necessarily has exactly what perfection forces",
-       e:"God-likeness is now built on P# rather than on P directly. This is the move that makes two of his own axioms redundant."}
+       e:"God-likeness is now built on P# rather than on P directly. This is the move that makes A4 and A5 unnecessary for the proof of T3."}
     ]},
     {t:"Theorems", items:[
-      {tag:"T3", f:"□∃x Gᴴ(x)", g:"from H:A12 and A3 alone", flaw:false,
-       e:"Here is the surprise. Gᴴ is positive by A3, so it is trivially necessarily implied by a positive property — itself. The biconditional then converts that straight into <span class='mono'>□Gᴴ(g)</span>: the God-like being is <em>necessarily</em> God-like, immediately.|Where Scott needs A5 and a whole essence argument to make God-like existence necessary, Hájek's definition hands it over. <strong>A4 and A5 are never used.</strong>"},
-      {tag:"MC", f:"p → □p", g:"not derivable",
+      {tag:"T3", f:"□∃x Gᴴ(x)", g:"from H:A12 and A3′ alone",
+       e:"Here is the surprise. Gᴴ is positive by A3′, so it is trivially necessarily implied by a positive property — itself. The biconditional then converts that straight into <span class='mono'>□Gᴴ(g)</span>: the God-like being is <em>necessarily</em> God-like, immediately.|Where Scott needs A5 and a whole essence argument to make God-like existence necessary, Hájek's definition hands it over. <strong>A4 and A5 are never used.</strong> The only frame condition is symmetry — <span class='mono'>KB</span>."},
+      {tag:"MC", f:"p → □p", g:"not entailed — here is a countermodel",
        e:"As with Anderson, Gᴴ is stated entirely in terms of <span class='mono'>□</span>, so a merely contingent sentence never reaches the biconditional."}
     ]}
   ],
   diff:{h:"What changed", p:["A1 and A2 merge into one weaker axiom; God-likeness is rebuilt on “necessarily implied by something positive” rather than on positivity itself."]},
-  gain:"Two axioms for the price of one — and Theorem 3 turns out to need only two of his four axioms. A4 and A5 are <em>superfluous</em>: the definition of God-likeness does the work Axiom 5 was written to do.",
-  lose:"Directness. God-likeness is now two definitions deep, and A4 and A5 stay in the system despite being unused — superfluous without being redundant, which is its own kind of untidiness.",
-  facts:[["Axioms used for T3","H:A12, A3 only"],["Frame for T3","symmetry — logic B"],["Modal collapse","no"]]
+  gain:"Two axioms for the price of one — and Theorem 3 needs only H:A12 and A3′ among the four displayed axioms. Hájek's own definition of God-likeness does the work his Axiom 5 was written to do.",
+  lose:"Directness: God-likeness is now two definitions deep. And A4 and A5 remain in the system despite being unused — the 2017 analysis finds them <em>superfluous but independent</em>, so unlike Anderson's they are not redundant, and cannot simply be dropped as derivable.",
+  facts:[["Axioms used for T3","H:A12, A3′ only"],["Frame for T3","symmetry — KB"],["A4, A5","superfluous, but independent"],["Modal collapse","no"]]
 }
 ];
 
 const TABLE = [
-  ["Gödel","1970","Inconsistent","bad","—","none (K)","n/a"],
-  ["Scott","1987","Consistent","warn","all five","symmetry (B)","yes"],
-  ["Anderson","1990","Consistent","ok","all","refl + trans + symm (S5)","no"],
-  ["Fitting","2002","Consistent","ok","all","none (K)","no"],
-  ["Hájek","2002","Consistent","ok","2 of 4","symmetry (B)","no"]
+  ["Gödel","1970","Inconsistent","bad","A1a, A2, A5 → ⊥","none (K)","n/a","n/a"],
+  ["Scott","c. 1972","Consistent","warn","all five","symmetry (KB)","yes","yes"],
+  ["Anderson","1990","Consistent","ok","all (A4, A5 reported redundant)","KB suffices; this proof uses S5","no","yes"],
+  ["Fitting","2002","Consistent","ok","all; de re and de dicto both","none (K)","no","yes"],
+  ["Hájek","2002","Consistent","ok","H:A12, A3′ only","symmetry (KB)","no","—"]
 ];
 
 const rail = document.getElementById('rail');
@@ -547,7 +585,8 @@ SYSTEMS.forEach(function(s, i){
 document.getElementById('tbody').innerHTML = TABLE.map(function(r){
   return '<tr><td class="nm">'+r[0]+'</td><td class="yr">'+r[1]+'</td>'+
     '<td><span class="pill '+r[3]+'">'+r[2]+'</span></td>'+
-    '<td class="m">'+r[4]+'</td><td class="m">'+r[5]+'</td><td class="m">'+r[6]+'</td></tr>';
+    '<td class="m">'+r[4]+'</td><td class="m">'+r[5]+'</td><td class="m">'+r[6]+'</td>'+
+    '<td class="m">'+r[7]+'</td></tr>';
 }).join('');
 
 // click to expand

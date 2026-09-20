@@ -442,3 +442,73 @@ Following Benzmuller, Weber and Woltzenlogel Paleo, "Computer-Assisted
 Analysis of the Anderson-Hajek Ontological Controversy", Logica Universalis 11
 (2017), pp. 139-151, Figure 3.  Hajek's second and third emendations (AOE0 and
 AOE*, their Figures 4 and 5) are not formalized here.
+
+
+Addendum: corrections following external review (2026-09-20)
+-------------------------------------------------------------
+
+'Godel.scott_monotheism' depends on axioms: [propext, Classical.choice, Quot.sound]
+
+Two external reviews of the public site were checked claim by claim.  Two
+substantive errors were confirmed and are corrected; one terminology error was
+confirmed; several overstatements were toned down.
+
+1. UNIQUENESS IS NOT PECULIAR TO ANDERSON.
+   The site and Anderson.lean claimed Scott's system cannot prove monotheism.
+   FALSE.  `Godel.scott_monotheism` now proves
+
+       God P x w -> God P y w -> y = x
+
+   from A1b ALONE -- no frame condition, no A4, no A5.  The trick is the same
+   one already used in Fitting.monotheism and Anderson.monotheism; it was
+   simply never applied to Scott.  Verified, not merely conceded.
+
+2. ANDERSON DOES NOT REQUIRE S5.
+   The site presented "needs full S5" as a cost of Anderson's variant.  That
+   is a fact about THIS Lean proof, not about Anderson's system.  Anderson
+   (1990, fn. 5) notes B suffices; Benzmueller, Weber and Woltzenlogel Paleo
+   (Logica Universalis 11, 2017) report T3 automated in KB, and A4 and A5
+   REDUNDANT for Anderson's emendation.  All such claims are now labelled as
+   properties of the derivation.  Tightening the proof toward KB is open work:
+   god_transfers uses transitivity and box_exists_of_god uses reflexivity.
+
+3. TERMINOLOGY: B vs KB.
+   Symmetry alone is KB.  The logic conventionally named B is KTB, which also
+   assumes reflexivity.  Corrected throughout.
+
+4. ANDERSON'S P(G) MISLABELLED.
+   Renamed the structure field from `T2` to `A3p`.  Anderson's own paper
+   numbers it Axiom 3*; Fitting's presentation -- which the AFP development
+   and this file follow -- reaches it as Proposition 11.16 and labels it T2.
+   It is postulated, not derived, so `T2` was actively misleading.  Fitting's
+   own `T2` field keeps its name, which is his, but is now documented as a
+   postulate.
+
+5. HAJEK: WHAT H:A12 RECOVERS.
+   The site said Goedel's full A1 is recovered as the case psi = phi.  FALSE:
+   what is recovered is Anderson's weakened A1a.  Hajek.lean was already
+   correct; the site was not.
+
+6. HAJEK: SUPERFLUOUS, NOT REDUNDANT.
+   The site said Hajek's definition makes A4 and A5 "redundant", contradicting
+   its own later text.  BWW 2017 report them superfluous AND independent --
+   hence NOT redundant.  Corrected.
+
+7. S5 IS NOT UNIVERSAL ACCESSIBILITY.
+   An arbitrary S5 frame is an equivalence relation and may have several
+   classes.  `s5_unique_world` assumes the UNIVERSAL relation, i.e. a single
+   cluster.  Docstrings corrected; `accessibility_eq`, which needs only
+   symmetry, is the general statement.
+
+8. FITTING: WHAT LOSES ITS WORLD.
+   The extension S is world-independent; `P : Ext I -> Sentence W` is not.
+   Whether a set counts as positive may still vary by world unless A4 pins it
+   down.  Clarified.
+
+Also: the possible-worlds primer on the site defined box/diamond over ALL
+worlds, i.e. assumed universal accessibility, on a page whose whole subject is
+the difference between K, KB and S5.  Corrected to general Kripke semantics.
+
+Not accepted: one review asserted the primer was fine as written (it was not),
+and gave a causal account on which the inconsistency runs through modal
+collapse (it does not -- it runs through the empty essence and A5 directly).

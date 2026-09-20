@@ -23,6 +23,7 @@ by whoever supplies them.  What appears is only Lean's own foundations.
 #print axioms Godel.scott_T3
 
 -- The price: modal collapse and what it does to the frame
+#print axioms Godel.scott_monotheism
 #print axioms Godel.modal_collapse
 #print axioms Godel.modal_collapse_iff
 #print axioms Godel.s5_unique_world

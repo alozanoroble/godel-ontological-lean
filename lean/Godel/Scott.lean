@@ -1,7 +1,9 @@
 import Godel.Original
 
 /-
-# Scott's 1987 variant: the positive argument, and its price
+# Scott's variant (c. 1972; published via Sobel 1987)
+
+The positive argument, and its price.
 
 Dana Scott's version of Gödel's argument differs in exactly one conjunct: his
 definition of essence requires that `x` actually have `φ`.  That single change
@@ -14,7 +16,9 @@ this file carries out the argument that Gödel intended:
 and then the objection that the argument has never shaken off:
 
 * `modal_collapse` — every truth is a necessary truth, `p → □p`;
-* `s5_unique_world` — under the `S5` reading, there is only one world.
+* `s5_unique_world` — under the *universal-accessibility* presentation of `S5`,
+  there is only one world.  (An arbitrary `S5` frame is an equivalence relation
+  and may have several classes; the theorem is about a single cluster.)
 
 ## Reading these theorems correctly
 
@@ -26,16 +30,23 @@ as a formalization can settle.  Whether the axioms should be granted is not a
 question Lean can answer.
 
 `modal_collapse` is the reason this matters.  From the same axioms one derives
-that nothing is contingent: every truth whatsoever is necessary.  That is a
-consequence most people are unwilling to accept, so the argument's soundness is
-bought at a price that is usually judged too high.  `s5_unique_world` makes the
-price vivid: under the usual `S5` reading the axioms force the space of
-possible worlds to be a single point.
+that nothing is contingent: every truth whatsoever is necessary.  Modal
+collapse is widely discussed as an objection to the Gödel/Scott system, though
+readings of its philosophical significance differ -- Kovač, among others, has
+argued that Gödel would not have regarded it as a defect.  `s5_unique_world`
+makes the consequence vivid: over the universal relation the axioms force the
+space of possible worlds to be a single point.
+
+Note also that consistency is not soundness.  Blocking Gödel's contradiction
+makes the derivation non-trivial; it says nothing about whether the axioms are
+true.
 
 ## Frame conditions
 
 The positive argument needs **symmetry** of the accessibility relation, and
-nothing else — no reflexivity, no transitivity.  That is the modal logic `B`,
+nothing else — no reflexivity, no transitivity.  That is the modal logic `KB`
+(K plus symmetry; the logic usually written `B` is `KTB`, which also assumes
+reflexivity),
 weaker than the `S5` in which the argument is usually presented.  Symmetry is
 used in exactly one place, `exists_god`.
 -/
@@ -93,6 +104,23 @@ theorem scott_T2 (hA1b : AxiomA1b P) (hA4 : AxiomA4 r P) {x : I} {w : W}
   intro ψ hψ v hv y hy
   exact hy ψ (hA4 w ψ (positive_of_god hA1b hg ψ hψ) v hv)
 
+/-- **Monotheism.**  God-like individuals are unique at a world.
+
+Being identical to a God-like `x` is a positive property — otherwise its
+negation would be positive by `A1b`, and `x`, having every positive property,
+would fail to be self-identical.  Any God-like `y` therefore has it.
+
+Uses `A1b` alone: no frame condition, no `A4`, no `A5`.
+
+**Uniqueness is not special to Anderson's variant.**  An earlier version of
+this development claimed in a comment that Scott's system could not prove it;
+that was false, and this theorem is the refutation.  Benzmüller and Scott
+(*Monatshefte für Mathematik* 208, 2025) likewise list monotheism as a
+consequence of the Gödel/Scott setting. -/
+theorem scott_monotheism (hA1b : AxiomA1b P) {x y : I} {w : W}
+    (hx : God P x w) (hy : God P y w) : y = x :=
+  hy (fun z _ => z = x) (positive_of_god hA1b hx (fun z _ => z = x) rfl)
+
 /-- A God-like individual makes the existence of a God-like individual
 necessary: `G(g) → □∃y G(y)`.
 
@@ -145,12 +173,17 @@ theorem modal_collapse_iff (hs : Symm r) (hrefl : ∀ w : W, r w w)
     (h : Scott1987 r P) (p : Sentence W) (w : W) : p w ↔ box r p w :=
   ⟨modal_collapse hs h p w, fun hb => hb w (hrefl w)⟩
 
-/-- **Under the `S5` reading, Scott's axioms force a single world.**
+/-- **Over the universal relation, Scott's axioms force a single world.**
 
 With `□` read as "at every world whatsoever", modal collapse applied to the
 sentence "being the world `w`" says that every world *is* `w`.  So the space of
 possible worlds collapses to a point, and with it every modal distinction the
-argument was stated in. -/
+argument was stated in.
+
+`S5` is named loosely here and in the literature.  An arbitrary `S5` frame is
+an equivalence relation and may have many classes; this theorem assumes the
+*universal* relation, i.e. a single cluster.  The general statement is
+`accessibility_eq` below, which needs only symmetry. -/
 theorem s5_unique_world (h : Scott1987 (univ : W → W → Prop) P) (v w : W) :
     v = w :=
   modal_collapse symm_univ h (fun u => u = w) w rfl v trivial
