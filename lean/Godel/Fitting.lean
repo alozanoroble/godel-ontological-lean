@@ -115,29 +115,44 @@ def NE (r : W → W → Prop) (Ex : I → W → Prop) : I → Sentence W :=
 def neExt (r : W → W → Prop) (Ex : I → W → Prop) (w : W) : Ext I :=
   fun x => NE r Ex x w
 
-/-- **Part I axioms.**  Enough for Theorem 1 and for the de re possibility of
-God-like existence, and no more. -/
-structure AxI (r : W → W → Prop) (Ex : I → W → Prop)
+/-- The three axioms that Theorem 1 and the de re argument actually need.
+`A1b` is deliberately *not* here: see `T3`. -/
+structure AxCore (r : W → W → Prop) (Ex : I → W → Prop)
     (P : Ext I → Sentence W) : Prop where
   A1a : ∀ (w : W) (S : Ext I), P (enot S) w → ¬ P S w
-  A1b : ∀ (w : W) (S : Ext I), ¬ P S w → P (enot S) w
   A2  : ∀ (w : W) (S T : Ext I), P S w → Entails r Ex S T w → P T w
   /-- Fitting's own label (Proposition 11.16), **postulated** here rather than
   derived; it plays the role of Gödel's `A3` for the extensional reading. -/
   T2  : ∀ w : W, P (godExt P w) w
 
-/-- **The full axiom set**, adding `A4` and `A5`. -/
+/-- **Part I axioms**, as Fitting states them. -/
+structure AxI (r : W → W → Prop) (Ex : I → W → Prop)
+    (P : Ext I → Sentence W) : Prop extends AxCore r Ex P where
+  A1b : ∀ (w : W) (S : Ext I), ¬ P S w → P (enot S) w
+
+/-- Exactly what the **de re** Theorem 3 consumes: the core plus `A5`.
+No `A1b`, no `A4`, no frame condition. -/
+structure AxT3 (r : W → W → Prop) (Ex : I → W → Prop)
+    (P : Ext I → Sentence W) : Prop extends AxCore r Ex P where
+  A5 : ∀ w : W, P (neExt r Ex w) w
+
+/-- **The full axiom set**, adding `A4` and `A5` to Part I. -/
 structure Ax (r : W → W → Prop) (Ex : I → W → Prop)
     (P : Ext I → Sentence W) : Prop extends AxI r Ex P where
   A4 : ∀ (w : W) (S : Ext I), P S w → ∀ v, r w v → P S v
   A5 : ∀ w : W, P (neExt r Ex w) w
+
+/-- The full system contains the de re fragment. -/
+theorem Ax.toAxT3 {r : W → W → Prop} {Ex : I → W → Prop}
+    {P : Ext I → Sentence W} (h : Ax r Ex P) : AxT3 r Ex P :=
+  { h.toAxI.toAxCore with A5 := h.A5 }
 
 variable {r : W → W → Prop} {Ex : I → W → Prop} {P : Ext I → Sentence W}
 
 /-- **Theorem 1.**  A positive extension is possibly exemplified.
 
 Uses `A1a` and `A2`; no frame condition. -/
-theorem T1 (h : AxI r Ex P) (S : Ext I) (w : W) (hS : P S w) :
+theorem T1 (h : AxCore r Ex P) (S : Ext I) (w : W) (hS : P S w) :
     ∃ v, r w v ∧ ∃ z, Ex z v ∧ S z :=
   Classical.byContradiction fun hc =>
     have key : ∀ T : Ext I, P T w := fun T =>
@@ -166,27 +181,52 @@ theorem god_essential (h : AxI r Ex P) {x : I} {w : W} (hg : God P x w) :
 
 /-- **De re possibility.**  Some accessible world holds an existing individual
 that is God-like *as read off at `w`*.  Part I only. -/
-theorem possible_deRe (h : AxI r Ex P) (w : W) :
+theorem possible_deRe (h : AxCore r Ex P) (w : W) :
     ∃ v, r w v ∧ ∃ z, Ex z v ∧ God P z w :=
   T1 h (godExt P w) w (h.T2 w)
 
+/-- **The singleton `{g}` is an essence of `g`**, with no axioms at all.
+
+This is where Fitting's extensional reading pays off in a way his intensional
+predecessors' does not.  An essence must necessarily entail every property its
+bearer has; a *set* `{g}` does so for free, because its only existing member
+anywhere is `g` itself, and `Entails` asks about membership only.  Nothing
+about positivity, and hence no `A1b`, is involved.
+
+Compare `Godel.hae_scottEss`, which needs the extra conjunct `u = v` precisely
+because Scott's essences quantify over world-indexed properties. -/
+theorem singleton_ess (g : I) (w : W) : Ess r Ex (fun z => z = g) g w :=
+  ⟨rfl, fun _T hT _v _hv _z _hz hz => hz ▸ hT⟩
+
 /-- A God-like individual makes God-like existence necessary.  This is the
-step that uses `A5`. -/
-theorem box_exists_of_god (h : Ax r Ex P) {g : I} {w : W} (hg : God P g w) :
-    ∀ v, r w v → ∃ z, Ex z v ∧ God P z w :=
-  hg (neExt r Ex w) (h.A5 w) (godExt P w) (god_essential h.toAxI hg)
+step that uses `A5`, and **only** `A5`.
+
+The route is the singleton, not `god_essential`: `A5` puts `g` in the
+necessary-existence extension, and `NE` applied to `{g}` says that `g` itself
+exists at every accessible world.  `god_essential` — and with it `A1b` — is
+never consulted. -/
+theorem box_exists_of_god (hA5 : ∀ w : W, P (neExt r Ex w) w) {g : I} {w : W}
+    (hg : God P g w) : ∀ v, r w v → ∃ z, Ex z v ∧ God P z w := by
+  intro v hwv
+  obtain ⟨z, hEz, rfl⟩ := hg (neExt r Ex w) (hA5 w) _ (singleton_ess g w) v hwv
+  exact ⟨z, hEz, hg⟩
 
 /-- **Theorem 3, de re.**  Necessarily, an individual God-like at `w` exists —
-*in `K`*.
+*in `K`*, from `A1a`, `A2`, `T2` and `A5`.
 
 No frame condition whatsoever, in contrast with Scott's variant, which needs
 symmetry (`Godel.exists_god`).  The reason is structural: `God P z w` freezes
 positivity at `w`, so the witness Theorem 1 produces at an accessible world is
-a witness simpliciter, and nothing has to be carried back. -/
-theorem T3 (h : Ax r Ex P) (w : W) :
+a witness simpliciter, and nothing has to be carried back.
+
+**Neither `A1b` nor `A4` is a hypothesis**, which is why this takes `AxT3`.
+`A4` was never used even by the earlier proof; `A1b` was, through
+`god_essential`, and `singleton_ess` removes the need for it.  Contrast
+`T3_deDicto`, which genuinely needs both. -/
+theorem T3 (h : AxT3 r Ex P) (w : W) :
     ∀ v, r w v → ∃ z, Ex z v ∧ God P z w := by
-  obtain ⟨_v, _hv, g, _hEg, hg⟩ := possible_deRe h.toAxI w
-  exact box_exists_of_god h hg
+  obtain ⟨_v, _hv, g, _hEg, hg⟩ := possible_deRe h.toAxCore w
+  exact box_exists_of_god h.A5 hg
 
 /-! ### From de re to de dicto
 
@@ -201,14 +241,14 @@ theorem god_from_accessible (h : Ax r Ex P) {z : I} {w v : W} (hwv : r w v)
   hz (godExt P w) (h.A4 w (godExt P w) (h.T2 w) v hwv)
 
 /-- Every world has a God-like individual (not necessarily an existing one). -/
-theorem exists_god_at (h : AxI r Ex P) (v : W) : ∃ z, God P z v := by
+theorem exists_god_at (h : AxCore r Ex P) (v : W) : ∃ z, God P z v := by
   obtain ⟨_u, _hu, z, _hz, hg⟩ := possible_deRe h v
   exact ⟨z, hg⟩
 
 /-- **God-likeness is stable** along accessibility.  Uses `A4` and monotheism. -/
 theorem god_stable (h : Ax r Ex P) {x : I} {w v : W} (hwv : r w v)
     (hx : God P x w) : God P x v := by
-  obtain ⟨z, hz⟩ := exists_god_at h.toAxI v
+  obtain ⟨z, hz⟩ := exists_god_at h.toAxI.toAxCore v
   obtain rfl : z = x := monotheism h.toAxI hx (god_from_accessible h hwv hz)
   exact hz
 
@@ -218,7 +258,7 @@ condition. -/
 theorem T3_deDicto (h : Ax r Ex P) (w : W) :
     ∀ v, r w v → ∃ z, Ex z v ∧ God P z v := by
   intro v hv
-  obtain ⟨z, hEz, hz⟩ := T3 h w v hv
+  obtain ⟨z, hEz, hz⟩ := T3 h.toAxT3 w v hv
   exact ⟨z, hEz, god_stable h hv hz⟩
 
 /-! ### Modal collapse fails, even in `S5`

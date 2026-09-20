@@ -16,15 +16,23 @@ by whoever supplies them.  What appears is only Lean's own foundations.
 #print axioms Godel.godel_1970_inconsistent_S5
 #print axioms Godel.empty_not_scottEss
 
--- Scott 1987: the positive argument
+-- Scott 1987: the positive argument, by Scott's own route
 #print axioms Godel.positive_of_god
 #print axioms Godel.scott_T2
+#print axioms Godel.box_exists_god_of_god
+#print axioms Godel.exists_god_viaT2
+#print axioms Godel.scott_T3_viaT2
+
+-- ... and the shorter route the encoding admits, without A1b or A4
+#print axioms Godel.hae_scottEss
+#print axioms Godel.blind_of_god
 #print axioms Godel.exists_god
 #print axioms Godel.scott_T3
 
 -- The price: modal collapse and what it does to the frame
 #print axioms Godel.scott_monotheism
 #print axioms Godel.modal_collapse
+#print axioms Godel.modal_collapse_of_T3
 #print axioms Godel.modal_collapse_iff
 #print axioms Godel.s5_unique_world
 #print axioms Godel.serial_of_scott
@@ -52,6 +60,7 @@ by whoever supplies them.  What appears is only Lean's own foundations.
 #print axioms Godel.Fitting.T1
 #print axioms Godel.Fitting.positive_of_god
 #print axioms Godel.Fitting.god_essential
+#print axioms Godel.Fitting.singleton_ess
 #print axioms Godel.Fitting.box_exists_of_god
 #print axioms Godel.Fitting.possible_deRe
 #print axioms Godel.Fitting.monotheism

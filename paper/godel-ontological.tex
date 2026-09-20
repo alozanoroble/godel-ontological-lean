@@ -427,6 +427,66 @@ be granted is not a question a proof assistant can address. What a proof
 assistant \emph{can} do is compute the rest of the bill, which is the subject
 of the next section.
 
+\subsection{A shorter route, and a warning about it}\label{sec:shortcut}
+
+The derivation above is Scott's, and it uses A1b and A4 through
+Theorem~\ref{thm:T2}. Our encoding also admits a route that uses neither. We
+record it because it is a genuine theorem of the encoding and because the gap
+between it and Scott's argument is itself informative --- but the warning
+attached to it is not a formality, and we state it before the lemma rather
+than after.
+
+\begin{lemma}[Haecceities are essences]\label{lem:haecceity}
+Fix $g$ and $v$ and let $\varphi := \lambda z\,u.\,(z = g \wedge u = v)$. Then
+$\varphi \esss g$ holds at $v$, with no axioms and over any frame.
+\end{lemma}
+
+\begin{proof}
+The first conjunct is $g = g \wedge v = v$. For the second, let $\psi$ be a
+property with $\psi(g)$ at $v$, let $r\,v\,u$, and let $y$ satisfy
+$\varphi(y)$ at $u$. Then $y = g$ and $u = v$, so what is required is
+$\psi(g)$ at $v$, which is the hypothesis.
+\end{proof}
+
+\begin{lemma}\label{lem:blind}
+If $\Gd(g)$ at $v$, then A5 alone gives $r\,v\,u \to u = v$ for all $u$.
+\end{lemma}
+
+\begin{proof}
+By D1 and A5, $\NES(g)$ holds at $v$. Apply it to the $\varphi$ of
+Lemma~\ref{lem:haecceity}: it yields $\Box_r \exists y\, \varphi(y)$ at $v$,
+and the only way $\varphi(y)$ can hold at $u$ is for $u$ to be $v$.
+\end{proof}
+
+\noindent
+Lemma~\ref{lem:blind} does on its own what Theorem~\ref{thm:frame} does with
+the full axiom set: A5 together with the definition of God-likeness seals off
+the world of a God-like individual. Theorem~\ref{thm:T3}, modal collapse and
+Theorem~\ref{thm:frame} all follow from it together with A1a, A2, A3 and
+symmetry, and our Lean statements of those results now carry exactly those
+hypotheses.
+
+\paragraph{The warning.} Whether a property may mention a particular world is
+a question about the \emph{comprehension principle} of the higher-order
+language --- about what counts as a property --- and not about Scott's axioms.
+Our shallow embedding makes every function $I \to W \to \Prp$ a property, so
+$\varphi$ is available. The published dependency analyses reach Theorem 3
+through Theorem 2 and accordingly list A4. We have not found the reduction in
+the literature, and we make \emph{no claim of novelty}: the far likelier
+explanation is that the divergence lives in Lemma~\ref{lem:haecceity} and that
+the reduction is an artefact of the encoding rather than a fact about Scott's
+system. It is reported because a formalization that silently admitted a
+shortcut it did not mention would be the worse for it, and because knowing
+where an encoding is more permissive than its source is exactly the sort of
+thing formalization is for.
+
+Fitting's variant makes the contrast sharp. The same idea works there with no
+warning at all: his essences are extensions, so the bare singleton $\{g\}$
+suffices and no world is named (Lemma~\ref{lem:singleton}). That the move is
+clean under the extensional reading and suspect under the intensional one is
+the intension/extension distinction reappearing as a difference in what the
+essence clause permits.
+
 \section{The price: modal collapse}\label{sec:collapse}
 
 \begin{theorem}[Modal collapse, Sobel]\label{thm:collapse}
@@ -444,6 +504,26 @@ is just $p$ at $w$, which holds; so the second conjunct of $\esss$ gives
 \]
 By Theorem~\ref{thm:T3}, $\Box_r \exists x\,\Gd(x)$ at $w$. So at each world
 accessible from $w$ there is a God-like individual, and hence $p$ holds there.
+\end{proof}
+
+\noindent
+The proof just given is Scott's. Our Lean \verb|modal_collapse| takes the
+shorter route of \S\ref{sec:shortcut} instead and so consumes only A1a, A2, A3,
+A5 and symmetry. The two are worth keeping apart, because "what does collapse
+need?" has different answers depending on whether Theorem 3 is expanded or
+taken as given. The relative question has a clean answer, and it is the one the
+published summaries record.
+
+\begin{proposition}[Collapse relative to Theorem 3]\label{thm:mcrel}
+Assume $r$ symmetric and serial, assume A1b and A4, and assume
+$\Box_r \exists x\,\Gd(x)$ at every world. Then modal collapse holds. None of
+A1a, A2, A3, A5 is used.
+\end{proposition}
+
+\begin{proof}
+Seriality gives $v$ with $r\,w\,v$; symmetry gives $r\,v\,w$; the hypothesis at
+$v$ then puts a God-like $g$ at $w$. Theorem~\ref{thm:T2}, which needs only A1b
+and A4, makes $\Gd \esss g$ at $w$, and the argument proceeds as above.
 \end{proof}
 
 \begin{corollary}
@@ -879,18 +959,64 @@ $\psi_p = \lambda y\,w.\,p(w)$, which tracks $p$ from world to world. An
 extension has no world argument. There is no extension that varies with $p$,
 the substitution has no counterpart, and the derivation stops.
 
-\begin{theorem}\label{thm:fitT3}
-Fitting's axioms entail $\Box\exists x\,\Gd^{\mathrm{F}}(x)$, \emph{over an
-arbitrary frame} --- the argument runs in $K$.
+The extensional reading also makes essences very cheap, and this time without
+the reservations of \S\ref{sec:shortcut}.
+
+\begin{lemma}[Singletons are essences]\label{lem:singleton}
+For any $g$ and $w$, the extension $\{g\}$ is a Fitting-essence of $g$ at $w$,
+with no axioms and over any frame.
+\end{lemma}
+
+\begin{proof}
+The first conjunct is $g \in \{g\}$. For the second, let $T$ be an extension
+with $g \in T$, let $r\,w\,v$, and let $z$ exist at $v$ with $z \in \{g\}$.
+Then $z = g$, so $z \in T$.
+\end{proof}
+
+\noindent
+Nothing here is contestable: extensions in Fitting's system are arbitrary sets
+of individuals, and $\{g\}$ is one. Contrast Lemma~\ref{lem:haecceity}, which
+needs a property mentioning a world precisely because Scott's essences range
+over intensions.
+
+\begin{theorem}[Theorem 3, de re]\label{thm:fitT3}
+A1a, A2, T2 and A5 entail $\Box\exists x\,(E(x) \wedge \Gd^{\mathrm{F}}_w(x))$,
+\emph{over an arbitrary frame} --- the argument runs in $K$. Neither A1b nor
+A4 is used.
 \end{theorem}
 
 \begin{proof}
-Theorem 1 goes through as before, giving a world $v$ accessible from $w$ and an
-individual $g$, existing at $v$, with $\Gd^{\mathrm{F}}(g)$ as evaluated at
-$w$. God-likeness is an essence of $g$, by the argument of
-Theorem~\ref{thm:T2} with extensions in place of properties; A5 then gives
-$\Box\exists z\,\Gd^{\mathrm{F}}(z)$ at $w$.
+Theorem 1 --- which needs A1a and A2 --- applied to T2 gives a world accessible
+from $w$ and an individual $g$ existing there with $\Gd^{\mathrm{F}}(g)$ as
+evaluated at $w$. By A5, $g$ belongs to the necessary-existence extension at
+$w$; applying that to $\{g\}$, which is an essence of $g$ by
+Lemma~\ref{lem:singleton}, gives that $g$ itself exists at every world
+accessible from $w$.
 \end{proof}
+
+\noindent
+A4 was never used even by the argument through
+Theorem~\ref{thm:T2}; A1b was, and Lemma~\ref{lem:singleton} removes the need
+for it. The de dicto reading is a different matter.
+
+\begin{theorem}[Theorem 3, de dicto]\label{thm:fitdd}
+Adding A1b and A4, the same hypotheses entail
+$\Box\exists x\,(E(x) \wedge \Gd^{\mathrm{F}}(x))$, with God-likeness
+re-evaluated at each world. Also in $K$.
+\end{theorem}
+
+\begin{proof}
+A4 carries the extension $\Gd^{\mathrm{F}}_w$ forward along $r$, so a God-like
+individual at an accessible world is God-like at $w$; monotheism, which uses
+A1b, identifies it with the witness supplied by Theorem~\ref{thm:fitT3}.
+\end{proof}
+
+\noindent
+This gives a clean division of labour, and it is visible in the types of the
+two theorems rather than only in their proofs: \textbf{A5 drives necessary
+existence de re; A4 drives the world-stability of God-likeness; A1b enters only
+through monotheism, which stability needs in order to identify witnesses.}
+Together they yield necessary existence de dicto.
 
 \noindent
 The absence of any frame condition here is not an accident, and
@@ -1123,21 +1249,32 @@ Theorem 1 (Lemma~\ref{lem:T1})        & A1a, A2                 & none \\
 Empty Essence (Lemma~\ref{lem:empty}) & none                    & none \\
 Inconsistency (Thm.~\ref{thm:main})   & A1a, A2, $\Pos(\NE)$    & none \quad($K$) \\
 Theorem 2 (Thm.~\ref{thm:T2})         & A1b, A4                 & none \\
-Theorem 3 (Thm.~\ref{thm:T3})         & all of Scott's          & symmetry \quad($KB$) \\
-Modal collapse (Thm.~\ref{thm:collapse}) & all of Scott's       & symmetry \quad($KB$) \\
-$r$ is equality (Thm.~\ref{thm:frame}) & all of Scott's         & symmetry \quad($KB$) \\
-One world (Thm.~\ref{thm:oneworld})   & all of Scott's          & universal \quad($S5U$) \\
+Seriality of $r$                      & A1a, A2, A3             & none \\
+Monotheism                            & A1b                     & none \\
+Theorem 3, Scott's route              & all of Scott's          & symmetry \quad($KB$) \\
+Theorem 3 (Thm.~\ref{thm:T3})$^{\ast}$ & A1a, A2, A3, A5        & symmetry \quad($KB$) \\
+Modal collapse (Thm.~\ref{thm:collapse})$^{\ast}$ & A1a, A2, A3, A5 & symmetry \quad($KB$) \\
+\quad relative to T3 (Thm.~\ref{thm:mcrel}) & A1b, A4, serial, T3 & symmetry \quad($KB$) \\
+$r$ is equality (Thm.~\ref{thm:frame})$^{\ast}$ & A1a, A2, A3, A5 & symmetry \quad($KB$) \\
+One world (Thm.~\ref{thm:oneworld})$^{\ast}$ & A1a, A2, A3, A5   & universal \quad($S5U$) \\
 \midrule
 Anderson's Thm.~3 (Thm.~\ref{thm:andT3}) & A1a, A2, A3$^{*}$ \emph{only} & symmetry \quad($KB$) \\
 \quad A5 for Anderson (Cor.~\ref{cor:a5}) & A2, A3$^{*}$        & none \quad($K$) \\
 \quad A4 for Anderson (Prop.~\ref{prop:a4}) & A1a, A2, A3$^{*}$ & symm.\ + trans.\ \quad($K4B$) \\
-Fitting's Thm.~3 (Thm.~\ref{thm:fitT3})  & all of Fitting's     & none \quad($K$) \\
+Fitting's Thm.~3 de re (Thm.~\ref{thm:fitT3}) & A1a, A2, T2, A5 & none \quad($K$) \\
+\quad de dicto (Thm.~\ref{thm:fitdd}) & \ $+$ A1b, A4            & none \quad($K$) \\
 H\'ajek's Thm.~3 (Thm.~\ref{thm:hajT3})  & H:A12, A3 \emph{only} & symmetry \quad($KB$) \\
 \bottomrule
 \end{tabular}
 \end{center}
 
 \noindent
+$^{\ast}$ These rows are starred because they depend on
+Lemma~\ref{lem:haecceity}, whose status is discussed there: the reduction is a
+theorem of our encoding, but it may not be one about Scott's system as
+intended, and the published dependency analyses give the unstarred route.
+Where the two differ, trust the unstarred one for claims about Scott.
+
 Every entry is what our proof consumes. In an earlier version the Anderson row
 carried a dagger, because our derivation then used $S5$ and the whole axiom set
 while the published values were $KB$ with A4 and A5 redundant. The dagger is
@@ -1223,8 +1360,13 @@ it is checked rather than asserted. The correspondence with this note is
 \verb|scott_T2|                   & Theorem~\ref{thm:T2} \\
 \verb|box_exists_god_of_god|      & Lemma~\ref{lem:boxgod} \\
 \verb|exists_god|                 & Lemma~\ref{lem:existsgod} \\
-\verb|scott_T3|                   & Theorem~\ref{thm:T3} \\
+\verb|scott_T3_viaT2|             & Theorem~\ref{thm:T3}, Scott's route \\
+\verb|hae_scottEss|               & Lemma~\ref{lem:haecceity} \\
+\verb|blind_of_god|               & Lemma~\ref{lem:blind} \\
+\verb|scott_T3|                   & Theorem~\ref{thm:T3}, short route \\
+\verb|serial_of_scott|            & seriality, over \verb|ScottCore| \\
 \verb|modal_collapse|             & Theorem~\ref{thm:collapse} \\
+\verb|modal_collapse_of_T3|       & Proposition~\ref{thm:mcrel} \\
 \verb|s5_unique_world|            & Theorem~\ref{thm:oneworld} \\
 \verb|accessibility_eq|           & Theorem~\ref{thm:frame} \\
 \verb|box_iff|, \verb|dia_iff|    & Corollary~\ref{cor:inert} \\
@@ -1240,7 +1382,9 @@ it is checked rather than asserted. The correspondence with this note is
 \verb|Anderson.A5_of_A2_A3p|      & Corollary~\ref{cor:a5} \\
 \verb|Anderson.A4_of_core|        & Proposition~\ref{prop:a4} \\
 \verb|Anderson.god_transfers|     & Lemma~\ref{lem:transfer} \\
+\verb|Fitting.singleton_ess|      & Lemma~\ref{lem:singleton} \\
 \verb|Fitting.T3|                 & Theorem~\ref{thm:fitT3} \\
+\verb|Fitting.T3_deDicto|         & Theorem~\ref{thm:fitdd} \\
 \verb|Hajek.T3|                   & Theorem~\ref{thm:hajT3} \\
 \verb|Anderson.noCollapse|, \verb|Fitting.noCollapse|, & \\
 \quad \verb|Hajek.noCollapse|     & Proposition~\ref{prop:variantsnocollapse} \\

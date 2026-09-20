@@ -333,6 +333,14 @@ img{ max-width: 100%; }
       development is actually unprovable. Conflating these is the easiest way to get this subject
       wrong — and an earlier version of this page did, in both directions. Two errors it contained
       are now corrected below and flagged where they occurred.</p>
+      <p>So an axiom can stand in three genuinely different relations to a theorem, and the
+      table above reports only the first:</p>
+      <p style="margin-left:1.2em"><strong>Used by this proof</strong> — it is a hypothesis of
+      the statement, enforced by the type. <strong>Derivable</strong> — it follows from the
+      others, so keeping it is redundant; Anderson's A4 and A5 are the only ones here shown to
+      be. <strong>Independent</strong> — there is a model of everything else in which it fails.
+      No axiom of Scott's or Fitting's system is claimed independent on this page; showing that
+      needs countermodels, and they have not been built.</p>
     </div>
   </section>
 
@@ -393,7 +401,7 @@ img{ max-width: 100%; }
     Hájek is Benzmüller, Weber and Woltzenlogel Paleo (2017).</p>
     <p>All five systems are formalised and certified in Lean 4 at
     <a href="https://github.com/alozanoroble/godel-ontological-lean">alozanoroble/godel-ontological-lean</a>.</p>
-    <p class="stamp">Page revised <strong>20 September 2026</strong><span id="rev"> · build 677faa1</span>. GitHub
+    <p class="stamp">Page revised <strong>20 September 2026</strong><span id="rev"> · build 30e236b</span>. GitHub
     Pages sets a ten-minute browser cache, so a copy loaded just before an update can lag by that
     much; a hard reload (<span class="kbd">Ctrl</span>/<span class="kbd">⌘</span> +
     <span class="kbd">Shift</span> + <span class="kbd">R</span>) always fetches the current one.</p>
@@ -469,7 +477,9 @@ const SYSTEMS = [
       {tag:"MT", f:"G(x) ∧ G(y) → x = y", g:"monotheism — God-like beings are unique",
        e:"Take the property of being identical to x. If it were not positive, A1b would make its negation positive — and a God-like x, having every positive property, would then have the property of being <em>different</em> from x, giving x ≠ x. So it is positive; and any God-like y has every positive property, so y = x.|Uses A1b alone: no frame condition, no A4, no A5. <strong>An earlier version of this page claimed uniqueness was unavailable in Scott's system. That was false</strong>, and <span class='mono'>Godel.scott_monotheism</span> in the Lean development is the correction."},
       {tag:"T3", f:"□∃x G(x)", g:"necessarily, a God-like being exists",
-       e:"The argument goes through as Gödel intended. This derivation needs only <strong>symmetry</strong> of the accessibility relation — the normal modal logic <span class='mono'>KB</span> — not the full S5 in which the argument is usually presented.|Terminology: <span class='mono'>KB</span> is K plus the symmetry axiom B; the system conventionally named <span class='mono'>B</span> is <span class='mono'>KTB</span>, which adds reflexivity too. So Anderson's “the weaker logic B suffices” and the later “T3 holds in KB” are two different claims, both correct, the second sharper."},
+       e:"The argument goes through as Gödel intended. This derivation needs only <strong>symmetry</strong> of the accessibility relation — the normal modal logic <span class='mono'>KB</span> — not the full S5 in which the argument is usually presented.|Terminology: <span class='mono'>KB</span> is K plus the symmetry axiom B; the system conventionally named <span class='mono'>B</span> is <span class='mono'>KTB</span>, which adds reflexivity too. So Anderson's “the weaker logic B suffices” and the later “T3 holds in KB” are two different claims, both correct, the second sharper.|Scott's own route runs through Theorem 2, and so uses A1b and A4. The formalization also admits a shorter one that uses neither — see the next line, and read the warning there before taking it at face value."},
+      {tag:"⚠", f:"φ := “being g, at v”", g:"a shortcut — and a reason to be careful", flaw:true,
+       e:"Fix an individual g and a world v, and consider the property <em>being g, at v</em>. Ask whether it is a Scott-essence of g at v. It is — with no axioms at all. The only way to have that property at an accessible world is to be g and for the world to be v, at which point whatever else is being demanded of you is being demanded at v, where g has it by hypothesis.|Now let g be God-like at v. A5 says necessary existence is positive, so g has it; apply it to this property and you get that every world accessible from v <em>is</em> v. A5 alone seals off the world of a God-like being. Theorem 3 and modal collapse both follow immediately, using <strong>neither A1b nor A4</strong>.|<strong>Why this is flagged rather than celebrated.</strong> Whether a property may name a particular world is a question about the comprehension principle of the higher-order language — about what counts as a property — not about Scott's axioms. This formalization makes every function from individuals and worlds to truth-values a property, so the shortcut is available. The published dependency analyses go through Theorem 2, and so list A4. The gap is most likely here.|So the honest statement is: this is a theorem about the <em>encoding</em>, and it may not be one about Scott's system as he meant it. It is recorded because a formalization that quietly hid it would be worse. Fitting's version of the same move needs no such warning — his essences are sets, so the bare singleton {g} does the job and no world gets named."},
       {tag:"MC", f:"p → □p", g:"modal collapse — every truth is necessary", flaw:true,
        e:"And here is the bill. For any proposition representable in the formal language: treat “being such that p” as a property. A God-like being has it; by Theorem 2 its God-likeness necessarily carries it along; and by Theorem 3 there is a God-like being at every accessible world. So p holds everywhere.|You had lunch today, so you <em>necessarily</em> had lunch today and could not have done otherwise. Nothing is contingent."}
     ]}
@@ -477,7 +487,7 @@ const SYSTEMS = [
   diff:{h:"What changed", p:["One conjunct: <span class='mono'>φ(x) ∧</span> at the front of the definition of essence. Nothing else."]},
   gain:"Consistency. The empty-property contradiction is blocked and the intended derivation can be carried out without triviality. Note that consistency is not soundness: it says nothing about whether the axioms are true.",
   lose:"Modal collapse. In this Kripke-semantic formalization, collapse together with Scott's axioms forces accessibility to reduce to identity — each world accesses only itself. The argument is conducted in a language about what might have been, and its own premises leave that language with nothing to say.",
-  facts:[["Frame for T3","symmetry — KB"],["Modal collapse","yes"],["Uniqueness","yes — from A1b alone"]]
+  facts:[["Frame for T3","symmetry — KB"],["Axioms used for T3","A1a, A2, A3, A5 ⚠"],["Scott's own route","adds A1b, A4"],["Modal collapse","yes"],["Uniqueness","yes — from A1b alone"]]
 },
 {
   id:"anderson", name:"Anderson", who:"C. A. Anderson", year:"1990",
@@ -530,10 +540,12 @@ const SYSTEMS = [
     ]},
     {t:"Theorems", items:[
       {tag:"MT", f:"G(x) ∧ G(y) → x = y", g:"monotheism", e:"Provable here too, by the same route as in Scott's and Anderson's systems. Uniqueness is common to all three."},
+      {tag:"ess", f:"{g} ess g", g:"the singleton is an essence, for free",
+       e:"Fitting's essences are <em>sets</em>, and this is where that pays. An essence of g must necessarily entail every property g has. Take the set whose only member is g. At any accessible world, the only thing that can be in it <em>is</em> g — so the property being demanded is one g already has. Nothing to prove.|No axioms at all. Compare Scott, where the same trick needs a property that names a particular world, because his essences range over world-indexed properties rather than sets."},
       {tag:"T3 de re", f:"□ ∃x ( E(x) ∧ G_w(x) )", g:"at every accessible world, an existing individual is God-like as read off here",
-       e:"God-likeness frozen at the world of evaluation. This needs <strong>no frame condition at all</strong> — it runs in K, the weakest normal modal logic.|The reason is structural: <span class='mono'>G_w</span> is fixed by the positivity facts at w, so a witness found at an accessible world is a witness full stop. Nothing has to be carried back — and carrying back is precisely what symmetry was buying in Scott's system."},
+       e:"God-likeness frozen at the world of evaluation. This needs <strong>no frame condition at all</strong> — it runs in K, the weakest normal modal logic.|The reason is structural: <span class='mono'>G_w</span> is fixed by the positivity facts at w, so a witness found at an accessible world is a witness full stop. Nothing has to be carried back — and carrying back is precisely what symmetry was buying in Scott's system.|<strong>It also needs only A1a, A2, T2 and A5.</strong> A4 was never used even by the earlier proof; A1b came in through the essence lemma, and the singleton above removes the need for it. A5 puts g in the necessary-existence set, and necessary existence applied to {g} says g itself exists at every accessible world — which is the conclusion."},
       {tag:"T3 de dicto", f:"□ ∃x ( E(x) ∧ G(x) )", g:"at every accessible world, an existing individual is God-like there",
-       e:"The reading re-evaluated at each world. Also a theorem, also in K; the bridge from the de re version is A4, which makes God-likeness stable along accessibility.|The two readings <em>do</em> come apart earlier — on Fitting's Part I axioms, before A4 is available, God-like existence is de re possible but not de dicto possible. The Lean development includes that two-world countermodel."},
+       e:"The reading re-evaluated at each world. Also a theorem, also in K; the bridge from the de re version is A4, which makes God-likeness stable along accessibility.|<strong>Here A4 genuinely is needed, and so is A1b</strong> — stability has to identify the God-like individual found at the accessible world with the one back home, and that is monotheism, which runs on A1b. So the two readings now differ in their axioms, not just their meaning: de re takes A1a, A2, T2, A5; de dicto takes those plus A1b and A4.|That gives a clean division of labour. <strong>A5 drives necessary existence; A4 drives world-stability.</strong> Together they give necessary existence de dicto.|The two readings <em>do</em> come apart earlier — on Fitting's Part I axioms, before A4 is available, God-like existence is de re possible but not de dicto possible. The Lean development includes that two-world countermodel."},
       {tag:"MC", f:"p → □p", g:"not entailed — here is a countermodel",
        e:"The collapse proof for Scott's system works by smuggling an arbitrary sentence p into the essence clause as a constant <em>property</em> — one that tracks p from world to world.|A set has no world to track. There is no extension that varies with p, so the substitution has no counterpart and that derivation stops."}
     ]}
@@ -541,7 +553,7 @@ const SYSTEMS = [
   diff:{h:"What changed", p:["Positivity moves from properties to sets. Essence and necessary existence are reformulated to follow it."]},
   gain:"No frame condition whatsoever — the weakest modal logic suffices — and the standard collapse derivation has nothing to substitute. It gives a particularly transparent diagnosis: that derivation depends critically on the intensional treatment of properties.",
   lose:"The intensional reading of “positive”. Gödel deliberately worked with properties, not sets, and did not assume that properties with the same members are the same property. Fitting's positivity cannot tell them apart.",
-  facts:[["Frame for T3","none — logic K"],["Modal collapse","no"],["Quantifiers","actualist, with an existence predicate"]]
+  facts:[["Frame for T3","none — logic K"],["de re T3","A1a, A2, T2, A5"],["de dicto T3","+ A1b, A4"],["Modal collapse","no"],["Quantifiers","actualist, with an existence predicate"]]
 },
 {
   id:"hajek", name:"Hájek", who:"Petr Hájek", year:"2002",
@@ -572,9 +584,9 @@ const SYSTEMS = [
 
 const TABLE = [
   ["Gödel","1970","Inconsistent","bad","⊥: A1a, A2, A5","none (K)","n/a","n/a"],
-  ["Scott","c. 1972","Consistent","warn","T3: all five","symmetry (KB)","yes","yes"],
+  ["Scott","c. 1972","Consistent","warn","T3: A1a, A2, A3, A5 ⚠ (Scott's route: all)","symmetry (KB)","yes","yes"],
   ["Anderson","1990","Consistent","ok","T3: A1*, A2, A3* only (A4, A5 derivable)","symmetry (KB)","no","yes"],
-  ["Fitting","2002","Consistent","ok","T3: all; de re and de dicto both","none (K)","no","yes"],
+  ["Fitting","2002","Consistent","ok","de re: A1a, A2, T2, A5 · de dicto: + A1b, A4","none (K)","no","yes"],
   ["Hájek","2002","Consistent","ok","T3: H:A12, A3′ only","symmetry (KB)","no","—"]
 ];
 
