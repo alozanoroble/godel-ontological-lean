@@ -64,7 +64,8 @@ question about models: Scott's axioms are satisfiable over a world set of any
 size whatsoever, but only as a disjoint heap of isolated one-world models.
 There is no non-degenerate model to be found.
 
-All of this presupposes symmetry, and we show it cannot be dispensed with. An
+All of this presupposes symmetry, and we show that it cannot simply be traded
+for the other $S5$ conditions. An
 explicit model over a reflexive transitive frame --- an $S4$ frame --- satisfies
 Scott's axioms while refuting Theorem 3, modal collapse and the equality of the
 frame. So Scott's axioms do not entail modal collapse by themselves; they
@@ -466,19 +467,39 @@ Theorem~\ref{thm:frame} all follow from it together with A1a, A2, A3 and
 symmetry, and our Lean statements of those results now carry exactly those
 hypotheses.
 
-\paragraph{The warning.} Whether a property may mention a particular world is
-a question about the \emph{comprehension principle} of the higher-order
-language --- about what counts as a property --- and not about Scott's axioms.
-Our shallow embedding makes every function $I \to W \to \Prp$ a property, so
-$\varphi$ is available. The published dependency analyses reach Theorem 3
-through Theorem 2 and accordingly list A4. We have not found the reduction in
-the literature, and we make \emph{no claim of novelty}: the far likelier
-explanation is that the divergence lives in Lemma~\ref{lem:haecceity} and that
-the reduction is an artefact of the encoding rather than a fact about Scott's
-system. It is reported because a formalization that silently admitted a
-shortcut it did not mention would be the worse for it, and because knowing
-where an encoding is more permissive than its source is exactly the sort of
-thing formalization is for.
+\paragraph{The status of Lemma~\ref{lem:haecceity}.} The reduction depends on
+the property domain containing world-indexed haecceities such as
+$H_{g,v}(z,u) :\equiv (z = g \wedge u = v)$. Our shallow embedding contains
+every function $I \to W \to \Prp$ and so contains this one. Whether that is
+faithful to Scott's intended quantification over properties depends on the
+semantics adopted, and there are two regimes.
+
+Under \emph{full intensional semantics}, where the property domain really is
+all of $I \times W \to \Prp$, $H_{g,v}$ is a perfectly legitimate property and
+the shortcut is a genuine consequence of Scott's definitions together with A5.
+Under a \emph{restricted or Henkin} property domain --- or one given by a modal
+comprehension schema over the object language --- the question is whether
+$H_{g,v}$ belongs to the domain at all. A standard modal object language has
+no term naming the current world, so definability is not automatic, and the
+shortcut may fail. Some presentations of Scott state the background theory
+with a comprehension schema rather than identifying properties with arbitrary
+sets of individual--world pairs, which is precisely why the distinction bites.
+
+One concrete data point. The Isabelle/HOL embedding used by Benzm\"uller and
+collaborators (AFP, \emph{Types, Tableaus and Gödel's God}, theory
+\verb|IHOML|) types a property as $\mathsf{ise} = \mathbf{0} \Rightarrow
+(i \Rightarrow \mathrm{bool})$ --- the same function space as ours --- and
+quantifies over it with plain HOL quantification, with no comprehension schema
+restricting property formation. So $H_{g,v}$ is expressible and in range there
+as well, and the reduction is unlikely to be peculiar to Lean. That is an
+inspection of their type declarations, not a proof run: we have not asked their
+development for Lemma~\ref{lem:blind}, and doing so is the natural next
+experiment. We make \emph{no claim of novelty} either way.
+
+The lemma is reported because a formalization that silently admitted a
+shortcut it did not mention would be the worse for it, and because locating
+the exact semantic assumption a reduction rests on is one of the things
+formalization is for.
 
 Fitting's variant makes the contrast sharp. The same idea works there with no
 warning at all: his essences are extensions, so the bare singleton $\{g\}$
@@ -676,7 +697,7 @@ isolated copies of Proposition~\ref{prop:scottcons}, each with its own God-like
 individual, none able to see any other. The one-world model is not forced; but
 nothing better than a heap of one-world models is available.
 
-\section{Symmetry is necessary}\label{sec:symm}
+\section{Symmetry cannot be traded for $S4$}\label{sec:symm}
 
 Symmetry is used in exactly one place, Lemma~\ref{lem:existsgod}, to carry
 $\Box\exists x\,\Gd(x)$ from a merely possible world back to the actual one.
@@ -684,7 +705,13 @@ That is the $B$ schema $\Diamond\Box p \to p$. Everything downstream ---
 Theorem~\ref{thm:T3}, modal collapse, Theorem~\ref{thm:frame} --- inherits the
 hypothesis from there. It is natural to ask whether it can be weakened.
 
-It cannot, and the reflexivity and transitivity of $S4$ are no substitute.
+It cannot be traded for the other two $S5$ conditions: reflexivity and
+transitivity are no substitute. Note what this does and does not show. It
+establishes that the symmetry hypothesis cannot simply be deleted from the
+$KB$ result in favour of the $S4$ conditions. It does \emph{not} establish
+that symmetry is necessary in the absolute sense; some frame condition weaker
+than, or incomparable with, symmetry might still suffice, and we prove no
+correspondence or minimality theorem that would rule this out.
 
 \begin{proposition}\label{prop:nosymm}
 There is a model of Scott's axioms over a reflexive, transitive, non-symmetric
@@ -1269,11 +1296,11 @@ H\'ajek's Thm.~3 (Thm.~\ref{thm:hajT3})  & H:A12, A3 \emph{only} & symmetry \qua
 \end{center}
 
 \noindent
-$^{\ast}$ These rows are starred because they depend on
-Lemma~\ref{lem:haecceity}, whose status is discussed there: the reduction is a
-theorem of our encoding, but it may not be one about Scott's system as
-intended, and the published dependency analyses give the unstarred route.
-Where the two differ, trust the unstarred one for claims about Scott.
+$^{\ast}$ These rows depend on Lemma~\ref{lem:haecceity}, and so on the
+property domain containing world-indexed haecceities --- a question about the
+semantics of the property quantifier, discussed there. Under full intensional
+semantics they stand as they are; under a restricted property domain they may
+not, and the unstarred route is the one the published analyses give.
 
 Every entry is what our proof consumes. In an earlier version the Anderson row
 carried a dagger, because our derivation then used $S5$ and the whole axiom set

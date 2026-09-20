@@ -155,14 +155,38 @@ at `v`; the only way to bear this one at an accessible world `u` is to be `g`
 with `u = v`, at which point the entailed property is being asked for at `v`
 itself, where it holds by hypothesis.  **No axioms, no frame condition.**
 
-⚠ *This is where the encoding may outrun the source.*  Whether Scott's system
-licenses a property that mentions a particular world is a question about the
-comprehension principle of his higher-order language, not about his axioms.
-The shallow embedding here makes every function `I → W → Prop` a property, so
-it is available.  The published dependency analyses reach Theorem 3 through
-Theorem 2, and hence through `A4`; the results below bypass that, and the
-divergence most likely lives in exactly this lemma.  Treat what follows as a
-fact about *this formalization*.
+⚠ *The status of this lemma is a question about property semantics, and it has
+two answers.*
+
+This reduction depends on the property domain containing world-indexed
+haecceities such as `H g v := fun z u => z = g ∧ u = v`.  The shallow
+embedding here contains every function `I → W → Prop`, so it contains this
+one.  Whether that is faithful to Scott's intended quantification over
+properties depends on the semantics adopted:
+
+- Under **full intensional semantics**, where the property domain really is
+  all of `I × W → Prop`, `H g v` is a perfectly legitimate property and the
+  shortcut is a genuine consequence of Scott's definitions together with `A5`.
+- Under a **restricted or Henkin property domain**, or one given by a modal
+  comprehension schema over the object language, the question is whether
+  `H g v` is in the domain at all.  A standard modal object language has no
+  term naming the current world, so definability is not automatic and the
+  shortcut may fail.
+
+Some published presentations of Scott do state the background theory with a
+comprehension schema rather than identifying properties with arbitrary sets of
+individual–world pairs, which is exactly why this matters.
+
+What can be said concretely: the Isabelle/HOL embedding used by Benzmüller and
+collaborators (AFP, *Types, Tableaus and Gödel's God*, theory `IHOML`) types a
+property as `ise = 𝟬 ⇒ io = 𝟬 ⇒ (i ⇒ bool)` — the same function space as here
+— and quantifies over it with plain HOL quantification, with no comprehension
+schema restricting property formation.  So `H g v` is expressible and in range
+there too, and this is unlikely to be peculiar to Lean.  **That is an
+inspection of their type declarations, not a proof run**: nobody has yet asked
+their development for `blind_of_god`.  Doing so is the open question, and it
+is recorded as such rather than settled here.  No novelty is claimed either
+way.
 
 Fitting's `Fitting.singleton_ess` is the same idea without the caveat: his
 essences are plain sets, so the bare singleton `{g}` suffices and no world is

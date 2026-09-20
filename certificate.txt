@@ -225,3 +225,66 @@ Status vocabulary used from here on, since these are genuinely different:
 Nothing below "DERIVABLE" has been established for Scott or Fitting; the
 reductions above are of the first kind, and no independence result is
 claimed for any axiom of either system.
+
+
+Addendum (same day, after referee review of this certificate)
+--------------------------------------------------------------
+
+Two corrections to the notes above.
+
+1. The diagnosis in Note 2 was wrong in its emphasis.  It said the divergence
+   from the published analyses "most likely" lives in hae_scottEss and that
+   the reduction is probably an encoding artefact.  That prejudges a question
+   that has two legitimate answers, and the right statement is neutral:
+
+     The reduction depends on the property domain containing world-indexed
+     haecceities H(g,v) := lambda z u. (z = g AND u = v).  The shallow Lean
+     embedding contains all such functions.  Whether that is faithful to
+     Scott's intended property quantification depends on the semantics
+     adopted.  Under FULL INTENSIONAL SEMANTICS, where the property domain is
+     all of I x W -> Prop, the shortcut is a genuine consequence of Scott's
+     definitions plus A5.  Under a RESTRICTED or HENKIN property domain, or
+     one given by a modal comprehension schema over the object language, the
+     question is whether H(g,v) is in the domain at all -- and a standard
+     modal object language has no term naming the current world, so
+     definability is not automatic.
+
+   Some published presentations of Scott do state the background theory with a
+   comprehension schema rather than identifying properties with arbitrary sets
+   of individual-world pairs, which is what makes the distinction bite.
+
+   One concrete data point, obtained by inspecting the published sources
+   rather than by running anything.  The Isabelle/HOL embedding used by
+   Benzmuller and collaborators (AFP, "Types, Tableaus and Godel's God",
+   theory IHOML) declares
+
+     typedecl i                     -- possible worlds
+     typedecl e                     -- individuals
+     type_synonym io  = (i => bool)
+     type_synonym ise = (e => io)   -- properties
+
+   so a property there is e => i => bool, the same function space as ours, and
+   quantification over it is plain HOL quantification with no comprehension
+   schema restricting property formation.  H(g,v) is therefore expressible and
+   in range in their encoding too, and the reduction is unlikely to be
+   peculiar to Lean.
+
+   THIS IS NOT THE EXPERIMENT.  Nobody has asked their development for
+   blind_of_god.  Two outcomes are worth distinguishing: if Isabelle proves it
+   in their existing encoding, this is a previously unremarked consequence of
+   the standard shallow HOL encoding; if their encoding cannot state or prove
+   it, comparing the property types pinpoints where this Lean representation
+   is stronger.  That experiment is the open question, and it is recorded as
+   open, not settled.
+
+2. "Symmetry is necessary" was an overclaim, here and elsewhere in this
+   development.  The S4 countermodel (ns_*) shows that the symmetry hypothesis
+   cannot simply be deleted from the KB results in favour of reflexivity and
+   transitivity.  It does NOT show symmetry is necessary in the absolute
+   sense: some frame condition weaker than, or incomparable with, symmetry
+   might still suffice, and no correspondence or minimality theorem here
+   excludes that.  The wording has been corrected in Sanity.lean, the paper
+   and the handoff.  certificate-20260919.txt carries the old phrasing and is
+   left as it stands, being a dated record; read this addendum against it.
+
+Neither correction changes a single Lean proof.  The dumps above stand.

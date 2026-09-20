@@ -42,9 +42,32 @@ claim about God-like existence available, and this file states both:
     de dicto  ∀ v, r w v → ∃ z, Ex z v ∧ God P z v   -- re-read at each `v`
 
 With the full axiom set **both are theorems** (`T3` and `T3_deDicto`); the
-bridge is `god_stable`, which needs `A4`. Following the Isabelle development,
-the axioms are therefore split into two bundles: `AxI`, the Part I axioms, and
-`Ax`, which adds `A4` and `A5`.
+bridge is `god_stable`, which needs `A4`.
+
+The axioms are split into **four** records, because the two readings turn out
+to differ in their axioms and not only in their meaning:
+
+    AxCore   A1a, A2, T2            Theorem 1 and everything de re
+    AxI      AxCore + A1b           Fitting's Part I, as he states it
+    AxT3     AxCore + A5            exactly what de re `T3` consumes
+    Ax       AxI + A4, A5           the full system
+
+`AxT3` is one of the results of this file rather than bookkeeping. The de re
+`T3` needs neither `A1b` nor `A4`: `A4` was never used, and `A1b` is avoidable
+because `singleton_ess` makes the bare singleton `{g}` an essence of `g` with
+no axioms at all — so `god_essential`, the only consumer of `A1b`, drops out.
+The de dicto reading genuinely needs both, giving the division
+
+    A5   drives necessary existence, de re
+    A4   drives world-stability of God-likeness
+    A1b  enters only through monotheism, which stability needs in order to
+         identify the witness at the accessible world with the one at home
+
+and the types of `T3` and `T3_deDicto` now carry that distinction.
+
+Unlike the analogous shortcut in Scott's system (`Godel.hae_scottEss`), this
+one rests on nothing contestable: extensions here *are* arbitrary sets of
+individuals, and `{g}` is one, with no world named inside it.
 
 The split matters, because the two readings *do* come apart on `AxI` alone.
 Section `DeDicto` at the end gives a two-world, two-individual model of `AxI`

@@ -141,16 +141,24 @@ end Isolated
 theorem scott_two_worlds : Scott1987 (isoR Bool) (isoP Bool) :=
   iso_satisfies_scott Bool
 
-/-! ## Symmetry cannot be dropped
+/-! ## Symmetry cannot be traded for `S4`
 
 `exists_god` is the only place the positive argument uses a frame condition,
 and it uses symmetry: it needs to carry `□∃x G(x)`, established at some
 *possible* world, back to the actual one.  That is the `B` schema
-`◇□p → p`.  Is symmetry really needed, or would something weaker do?
+`◇□p → p`.  Could the other two `S5` conditions do the job instead?
 
-It is really needed, and nothing in the `S4` direction helps.  The model below
-is **reflexive and transitive** — an `S4` frame — satisfies all of Scott's
-axioms, and refutes Theorem 3, modal collapse and `accessibility_eq` outright.
+No.  The model below is **reflexive and transitive** — an `S4` frame —
+satisfies all of Scott's axioms, and refutes Theorem 3, modal collapse and
+`accessibility_eq` outright.
+
+**Be careful what this shows.**  It shows the symmetry hypothesis cannot be
+deleted from the `KB` results in favour of reflexivity and transitivity.  It
+does **not** show that symmetry is necessary in the absolute sense: some frame
+condition weaker than, or incomparable with, symmetry might still suffice, and
+no correspondence or minimality theorem here excludes that.  An earlier
+version of this file said "symmetry is really needed", which claimed more than
+the countermodel delivers.
 
 Two worlds, `false` and `true`.  `false` sees both; `true` sees only itself.
 One individual.  A property is positive, at either world, exactly when the
