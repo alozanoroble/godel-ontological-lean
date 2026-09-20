@@ -74,8 +74,9 @@ of the axioms alone.
 
 We then formalize the three emendations that repair this. Anderson's drops the
 implausible half of Axiom 1 and strengthens God-likeness and essence to
-biconditionals; it makes God-like individuals unique, and its Theorem 3 needs
-full $S5$. Fitting's makes positivity a predicate on \emph{extensions} rather
+biconditionals, which makes uniqueness especially direct --- though uniqueness
+is available in Scott's system too, from A1b alone. Fitting's makes positivity
+a predicate on \emph{extensions} rather
 than intensional properties; its Theorem 3 needs no frame condition at all, and
 the reason connects directly to the previous paragraph. H\'ajek's merges two
 axioms into one weaker one, and the resulting definition of God-likeness makes
@@ -120,7 +121,7 @@ Scott's version is another matter. It is consistent, the argument goes through,
 and the objection that has dogged it since Sobel is not unsoundness but
 \emph{modal collapse}: the axioms entail that every truth is a necessary truth.
 
-This note formalizes all five systems in Lean 4, in 371 lines of code with no
+This note formalizes all five systems in Lean 4, in 378 lines of code with no
 library dependencies. The point of doing so is not doubt about the mathematics, which
 is short and entirely comprehensible, but bookkeeping: in a formalization every
 axiom and every frame condition a result consumes appears as a named hypothesis
@@ -680,8 +681,7 @@ with $\NE^{\mathrm{A}}$ as before but using $\ess^{\mathrm{A}}$. The axioms are
 A1a, A2, A4, $\Pos(\NE^{\mathrm{A}})$, and $\Pos(\Gd^{\mathrm{A}})$ postulated
 in place of A3.
 
-The biconditional in $\Gd^{\mathrm{A}}$ buys something Scott's system does not
-have.
+The biconditional in $\Gd^{\mathrm{A}}$ makes uniqueness especially direct.
 
 \begin{proposition}[Monotheism]\label{prop:mono}
 Over a reflexive frame, Anderson's axioms make God-like individuals unique: if
@@ -693,6 +693,17 @@ Let $\varphi := \lambda z\,u.\,(z = x)$. Then $\Box\varphi(x)$ holds at $w$, so
 $\Pos(\varphi)$ at $w$ by $\Gd^{\mathrm{A}}(x)$; so $\Box\varphi(y)$ at $w$ by
 $\Gd^{\mathrm{A}}(y)$; and reflexivity gives $\varphi(y)$ at $w$, i.e. $y = x$.
 \end{proof}
+
+\noindent
+Uniqueness is \emph{not} peculiar to Anderson, and an earlier version of this
+note said it was. The same argument runs in Scott's system, from A1b alone and
+with no frame condition at all: if being identical to a God-like $x$ were not
+positive then its negation would be, by A1b, and $x$ --- having every positive
+property --- would fail to be self-identical. So it is positive, and any
+God-like $y$ has it. This is \verb|Godel.scott_monotheism| in the development,
+and Benzm\"uller and Scott~\cite{bs2025} likewise record monotheism as a
+consequence of the G\"odel/Scott setting. What Anderson's biconditional buys is
+directness, not the theorem.
 
 \begin{lemma}\label{lem:transfer}
 Over an $S5$ frame, God-likeness is stable: if $\Gd^{\mathrm{A}}(x)$ at $w$ and
@@ -710,6 +721,18 @@ $\Pos(\varphi)$ at $w$, hence $\Pos(\varphi)$ at $v$ by A4.
 \begin{theorem}\label{thm:andT3}
 Over an $S5$ frame, Anderson's axioms entail $\Box\exists x\,\Gd^{\mathrm{A}}(x)$.
 \end{theorem}
+
+\noindent
+Read the hypothesis as what \emph{this derivation} consumes, not as what
+Anderson's system requires. Anderson himself (1990, fn.~5) notes that the
+weaker logic $B$ suffices for Theorem 3, and Benzm\"uller, Weber and
+Woltzenlogel Paleo~\cite{bww2017} report it automated in $KB$ --- and further
+report A4 and A5 \emph{redundant} for this emendation, derivable from the rest.
+Our proof is therefore not minimal, in frame strength or in axioms; reaching
+$KB$ would need a different route, since Lemma~\ref{lem:transfer} uses
+transitivity and the necessary-existence step uses reflexivity. An earlier
+version of this note reported the $S5$ as a cost of Anderson's variant, which
+was a mistake of exactly the kind Section~\ref{sec:caveats} warns about.
 
 \begin{proof}
 God-likeness is an $\ess^{\mathrm{A}}$-essence of any God-like $x$: the forward
@@ -960,26 +983,32 @@ Theorem 1 (Lemma~\ref{lem:T1})        & A1a, A2                 & none \\
 Empty Essence (Lemma~\ref{lem:empty}) & none                    & none \\
 Inconsistency (Thm.~\ref{thm:main})   & A1a, A2, $\Pos(\NE)$    & none \quad($K$) \\
 Theorem 2 (Thm.~\ref{thm:T2})         & A1b, A4                 & none \\
-Theorem 3 (Thm.~\ref{thm:T3})         & all of Scott's          & symmetry \quad($B$) \\
-Modal collapse (Thm.~\ref{thm:collapse}) & all of Scott's       & symmetry \quad($B$) \\
-$r$ is equality (Thm.~\ref{thm:frame}) & all of Scott's         & symmetry \quad($B$) \\
+Theorem 3 (Thm.~\ref{thm:T3})         & all of Scott's          & symmetry \quad($KB$) \\
+Modal collapse (Thm.~\ref{thm:collapse}) & all of Scott's       & symmetry \quad($KB$) \\
+$r$ is equality (Thm.~\ref{thm:frame}) & all of Scott's         & symmetry \quad($KB$) \\
 One world (Thm.~\ref{thm:oneworld})   & all of Scott's          & universal \quad($S5U$) \\
 \midrule
-Anderson's Thm.~3 (Thm.~\ref{thm:andT3}) & all of Anderson's    & refl., trans., symm. \quad($S5$) \\
+Anderson's Thm.~3 (Thm.~\ref{thm:andT3}) & all of Anderson's$^{\dagger}$ & symmetry \quad($KB$)$^{\dagger}$ \\
 Fitting's Thm.~3 (Thm.~\ref{thm:fitT3})  & all of Fitting's     & none \quad($K$) \\
-H\'ajek's Thm.~3 (Thm.~\ref{thm:hajT3})  & H:A12, A3 \emph{only} & symmetry \quad($B$) \\
+H\'ajek's Thm.~3 (Thm.~\ref{thm:hajT3})  & H:A12, A3 \emph{only} & symmetry \quad($KB$) \\
 \bottomrule
 \end{tabular}
 \end{center}
 
 \noindent
-By Proposition~\ref{prop:nosymm} the symmetry entries are sharp: rows three to
-six all fail over a reflexive transitive frame, so no weakening in the $S4$
-direction is available for Scott's system. The last three rows are the point of
-Section~\ref{sec:variants}: Anderson pays more in frame strength than Scott
-does, Fitting pays nothing at all, H\'ajek pays the same as Scott but with two
-of his four axioms unused --- and all three avoid the collapse. Frame strength
-is not the variable that matters.
+$^{\dagger}$ These are the published values, not ours. Our Lean derivation of
+Anderson's Theorem 3 uses reflexivity, transitivity and symmetry and the whole
+axiom set; Anderson (fn.~5) and~\cite{bww2017} give $KB$, with A4 and A5
+redundant. Every other entry is what our proof consumes.
+
+By Proposition~\ref{prop:nosymm} the symmetry entries for Scott are sharp: they
+fail over a reflexive transitive frame, so no weakening in the $S4$ direction
+is available there. The last three rows are the point of
+Section~\ref{sec:variants}: Fitting pays no frame strength at all, H\'ajek pays
+the same as Scott but with two of his four axioms unused, and Anderson --- on
+the published analysis --- pays no more than Scott either. All three avoid the
+collapse, at differing frame strengths. Frame strength is not the variable that
+matters; the shape of the essence clause is.
 
 \noindent
 Two comments. First, the refutation of G\"odel's axioms needs no frame
@@ -994,7 +1023,7 @@ does not.
 
 \section{The Lean 4 development}\label{sec:lean}
 
-The development is 1383 lines across seven files, of which 371 are code and the
+The development is 1461 lines across seven files, of which 378 are code and the
 rest documentation, with \textbf{no dependency on Mathlib or any other library} --- nothing beyond Lean's core
 logic is needed --- and builds in a couple of seconds. The shallow embedding is
 direct:
@@ -1150,6 +1179,11 @@ C. Benzm\"uller and D. Fuenmayor.
 \newblock Computer-supported analysis of positive properties, ultrafilters and
   modal collapse in variants of G\"odel's ontological argument.
 \newblock \emph{Bulletin of the Section of Logic} 49 (2020), no.~2, 127--148.
+
+\bibitem{bs2025}
+C. Benzm\"uller and D. Scott.
+\newblock Notes on G\"odel's and Scott's variants of the ontological argument.
+\newblock \emph{Monatshefte f\"ur Mathematik} 208 (2025), 569--611.
 
 \bibitem{bww2017}
 C. Benzm\"uller, L. Weber and B. Woltzenlogel Paleo.
