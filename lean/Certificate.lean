@@ -63,11 +63,22 @@ by whoever supplies them.  What appears is only Lean's own foundations.
 
 -- Anderson's variant (1990): biconditional God-likeness and essence
 #print axioms Godel.Anderson.T1
+#print axioms Godel.Anderson.axiomA1_iff_A1star
 #print axioms Godel.Anderson.monotheism
+-- the direct route: T3 in KB from A1a, A2, A3* alone
+#print axioms Godel.Anderson.box_god
+#print axioms Godel.Anderson.god_back
+#print axioms Godel.Anderson.exists_god
+#print axioms Godel.Anderson.T3
+-- the two published redundancy results, now proved rather than cited
+#print axioms Godel.Anderson.ne_universal
+#print axioms Godel.Anderson.A5_of_A2_A3p
+#print axioms Godel.Anderson.A4_of_core
+-- Anderson's own essence route, kept for comparison
 #print axioms Godel.Anderson.god_transfers
 #print axioms Godel.Anderson.god_essential
 #print axioms Godel.Anderson.box_exists_of_god
-#print axioms Godel.Anderson.T3
+#print axioms Godel.Anderson.T3_viaEssence
 #print axioms Godel.Anderson.noCollapse_axioms
 #print axioms Godel.Anderson.noCollapse
 

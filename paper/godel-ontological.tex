@@ -74,15 +74,24 @@ of the axioms alone.
 
 We then formalize the three emendations that repair this. Anderson's drops the
 implausible half of Axiom 1 and strengthens God-likeness and essence to
-biconditionals, which makes uniqueness especially direct --- though uniqueness
-is available in Scott's system too, from A1b alone. Fitting's makes positivity
-a predicate on \emph{extensions} rather
-than intensional properties; its Theorem 3 needs no frame condition at all, and
-the reason connects directly to the previous paragraph. H\'ajek's merges two
-axioms into one weaker one, and the resulting definition of God-likeness makes
-his Axioms 4 and 5 superfluous: Theorem 3 follows from two of his four axioms.
-All three avoid modal collapse, and we exhibit two-world $S5$ models certifying
-it.
+biconditionals. This turns out to be enough on its own: because God-likeness is
+defined by a biconditional whose right-hand side is already a $\Box$, the axiom
+asserting God-likeness positive converts in a single step into the
+\emph{necessity} of God-likeness, and the essence apparatus is bypassed
+entirely. His Theorem 3 then follows in $KB$ from three axioms, his Axiom 4 is
+derivable in $K4B$, and his Axiom 5 is not merely derivable but vacuous ---
+Anderson's necessary existence holds of every individual at every world. These
+last facts are not new; they are reported from automated analysis
+in~\cite{bww2017}, and what we add is only that they are now enforced by the
+types of the corresponding Lean theorems. Uniqueness, which the biconditional
+makes especially direct, needs no frame condition at all --- though it is
+available in Scott's system too, from A1b alone. Fitting's makes positivity a
+predicate on \emph{extensions} rather than intensional properties; its Theorem 3
+needs no frame condition at all, and the reason connects directly to the
+previous paragraph. H\'ajek's merges two axioms into one weaker one, and the
+resulting definition of God-likeness makes his Axioms 4 and 5 superfluous:
+Theorem 3 follows from two of his four axioms. All three avoid modal collapse,
+and we exhibit two-world $S5$ models certifying it.
 
 For Fitting's variant we also separate the de re and de dicto readings of the
 conclusion. Both are theorems on the full axiom set; on his Part I axioms,
@@ -681,18 +690,43 @@ with $\NE^{\mathrm{A}}$ as before but using $\ess^{\mathrm{A}}$. The axioms are
 A1a, A2, A4, $\Pos(\NE^{\mathrm{A}})$, and $\Pos(\Gd^{\mathrm{A}})$ postulated
 in place of A3.
 
-The biconditional in $\Gd^{\mathrm{A}}$ makes uniqueness especially direct.
+The biconditional in $\Gd^{\mathrm{A}}$ does far more work than it first
+appears to, and the following one-line lemma is the reason. It is the engine of
+the entire variant.
+
+\begin{lemma}[God-likeness is self-propagating]\label{lem:andboxgod}
+From $\Pos(\Gd^{\mathrm{A}})$ alone: if $\Gd^{\mathrm{A}}(x)$ at $w$, then
+$\Box\Gd^{\mathrm{A}}(x)$ at $w$. No frame condition, and no other axiom.
+\end{lemma}
+
+\begin{proof}
+Instantiate the biconditional $\Pos(\varphi) \leftrightarrow \Box\varphi(x)$ of
+$\Gd^{\mathrm{A}}(x)$ at $\varphi := \Gd^{\mathrm{A}}$. The left-hand side is
+Anderson's A3$^{*}$.
+\end{proof}
+
+\noindent
+Where G\"odel and Scott reach the corresponding step through the whole essence
+apparatus together with A5, Anderson gets it by feeding a definition to itself.
+Uniqueness comes almost as cheaply.
 
 \begin{proposition}[Monotheism]\label{prop:mono}
-Over a reflexive frame, Anderson's axioms make God-like individuals unique: if
+Anderson's axioms make God-like individuals unique, over \emph{any} frame: if
 $\Gd^{\mathrm{A}}(x)$ and $\Gd^{\mathrm{A}}(y)$ at $w$, then $y = x$.
 \end{proposition}
 
 \begin{proof}
 Let $\varphi := \lambda z\,u.\,(z = x)$. Then $\Box\varphi(x)$ holds at $w$, so
 $\Pos(\varphi)$ at $w$ by $\Gd^{\mathrm{A}}(x)$; so $\Box\varphi(y)$ at $w$ by
-$\Gd^{\mathrm{A}}(y)$; and reflexivity gives $\varphi(y)$ at $w$, i.e. $y = x$.
+$\Gd^{\mathrm{A}}(y)$. Theorem~\ref{lem:T1} applied to $\Gd^{\mathrm{A}}$,
+which is positive by A3$^{*}$, supplies a world $v$ with $r\,w\,v$; evaluating
+$\Box\varphi(y)$ there gives $\varphi(y)$, i.e.\ $y = x$.
 \end{proof}
+
+\noindent
+An earlier version of this note assumed reflexivity for that last step. It is
+not needed: A1a, A2 and A3$^{*}$ already guarantee that $w$ has a successor,
+which is all the argument wants.
 
 \noindent
 Uniqueness is \emph{not} peculiar to Anderson, and an earlier version of this
@@ -704,6 +738,104 @@ God-like $y$ has it. This is \verb|Godel.scott_monotheism| in the development,
 and Benzm\"uller and Scott~\cite{bs2025} likewise record monotheism as a
 consequence of the G\"odel/Scott setting. What Anderson's biconditional buys is
 directness, not the theorem.
+
+\begin{theorem}\label{thm:andT3}
+Over a \emph{symmetric} frame --- the logic $KB$ --- A1a, A2 and
+$\Pos(\Gd^{\mathrm{A}})$ entail $\Box\exists x\,\Gd^{\mathrm{A}}(x)$. Neither
+A4 nor A5 is used.
+\end{theorem}
+
+\begin{proof}
+$\Gd^{\mathrm{A}}$ is positive by A3$^{*}$, so Theorem~\ref{lem:T1} --- which
+needs only A1a and A2 --- gives a world $v$ with $r\,w\,v$ and an $x$ with
+$\Gd^{\mathrm{A}}(x)$ at $v$. By Lemma~\ref{lem:andboxgod},
+$\Box\Gd^{\mathrm{A}}(x)$ at $v$; symmetry gives $r\,v\,w$, so
+$\Gd^{\mathrm{A}}(x)$ at $w$. Applying Lemma~\ref{lem:andboxgod} again at $w$
+gives $\Box\Gd^{\mathrm{A}}(x)$ at $w$, and in particular
+$\Box\exists x\,\Gd^{\mathrm{A}}(x)$.
+\end{proof}
+
+\noindent
+A1a and A2 enter only through Theorem~\ref{lem:T1}, and only to guarantee that
+$w$ has a successor at all. Symmetry is used once, to bring the individual home
+from the world where Theorem~1 found it.
+
+This matches what is already known. Anderson himself (1990, fn.~5) notes that
+the weaker logic $B$ --- that is, $KTB$ --- suffices for Theorem 3, and
+Benzm\"uller, Weber and Woltzenlogel Paleo~\cite{bww2017} report it automated
+in the weaker $KB$ again. \emph{We claim no new mathematics here.} What is new
+in this development is only that the frame condition and the axiom list are now
+carried by the type of Theorem~\ref{thm:andT3} --- it takes a record containing
+A1a, A2 and A3$^{*}$ and nothing else --- rather than being recorded in prose
+alongside a proof that in fact used more. An earlier version of this note
+derived Theorem~\ref{thm:andT3} over $S5$ from the full axiom set and flagged
+the gap to $KB$ as open work; that route survives as
+\verb|Anderson.T3_viaEssence|, and the contrast is instructive, since it shows
+the $S5$ was a property of the argument rather than of Anderson's system.
+
+\subsubsection*{A4 and A5 are redundant}
+
+The same paper reports A4 and A5 \emph{redundant} for this emendation, A5
+already in $K$ and A4 in $K4B$. Both are now proved rather than cited. The
+first is stronger than redundancy.
+
+\begin{proposition}\label{prop:nevac}
+With Anderson's essence, $\NE^{\mathrm{A}}(x)$ holds for every $x$ at every
+world, with no axioms and over any frame.
+\end{proposition}
+
+\begin{proof}
+Let $\varphi \ess^{\mathrm{A}} x$ at $w$ and instantiate its biconditional at
+$\psi := \varphi$. The right-hand side is
+$\Box\forall y\,(\varphi(y) \to \varphi(y))$, a validity, so $\Box\varphi(x)$
+holds at $w$. Hence at every $v$ with $r\,w\,v$ we have $\varphi(x)$, so
+$\exists y\,\varphi(y)$; that is, $\Box\exists y\,\varphi(y)$ at $w$.
+\end{proof}
+
+\begin{corollary}\label{cor:a5}
+A2 and A3$^{*}$ entail $\Pos(\NE^{\mathrm{A}})$, over any frame.
+\end{corollary}
+
+\begin{proof}
+$\Pos(\Gd^{\mathrm{A}})$ by A3$^{*}$, and
+$\Box\forall x\,(\Gd^{\mathrm{A}}(x) \to \NE^{\mathrm{A}}(x))$ holds because
+its consequent is true outright, by Proposition~\ref{prop:nevac}. Apply A2.
+\end{proof}
+
+\noindent
+So A5 is not merely derivable in Anderson's system: it is contentless there,
+because $\NE^{\mathrm{A}}$ is the universally true property. The axiom
+philosophers argue over hardest in G\"odel's system does no work at all in
+Anderson's.
+
+\begin{proposition}\label{prop:a4}
+Over a symmetric and transitive frame --- the logic $K4B$ --- A1a, A2 and
+A3$^{*}$ entail A4.
+\end{proposition}
+
+\begin{proof}
+Let $\Pos(\varphi)$ at $w$ and $r\,w\,u$. As in Theorem~\ref{thm:andT3} there
+is a $g$ with $\Gd^{\mathrm{A}}(g)$ at $w$, and by Lemma~\ref{lem:andboxgod} also
+at $u$. From $\Gd^{\mathrm{A}}(g)$ at $w$ and $\Pos(\varphi)$ at $w$ we get
+$\Box\varphi(g)$ at $w$. For any $u'$ with $r\,u\,u'$, transitivity gives
+$r\,w\,u'$ and hence $\varphi(g)$ at $u'$; so $\Box\varphi(g)$ at $u$, and
+$\Gd^{\mathrm{A}}(g)$ at $u$ converts that to $\Pos(\varphi)$ at $u$.
+\end{proof}
+
+\noindent
+Both frame conditions agree with those reported in~\cite{bww2017}.
+
+\paragraph{Scope.} All of the above is for the constant-domain (possibilist)
+reading used throughout this note. Under the \emph{mixed} reading Anderson
+himself floats --- actualist quantifiers only in Theorem 3 and in the
+definition of essence ---~\cite{bww2017} find A4 still redundant but A5
+\emph{independent}, and report a countermodel to Theorem 3 itself. Domain
+choice is not a free parameter, and none of Theorem~\ref{thm:andT3},
+Corollary~\ref{cor:a5} or Proposition~\ref{prop:a4} transfers there.
+
+\subsubsection*{Anderson's own route}
+
+The essence argument is retained in the development for comparison.
 
 \begin{lemma}\label{lem:transfer}
 Over an $S5$ frame, God-likeness is stable: if $\Gd^{\mathrm{A}}(x)$ at $w$ and
@@ -718,36 +850,15 @@ then symmetry and transitivity give $\Box\varphi(x)$ at $w$, hence
 $\Pos(\varphi)$ at $w$, hence $\Pos(\varphi)$ at $v$ by A4.
 \end{proof}
 
-\begin{theorem}\label{thm:andT3}
-Over an $S5$ frame, Anderson's axioms entail $\Box\exists x\,\Gd^{\mathrm{A}}(x)$.
-\end{theorem}
-
 \noindent
-Read the hypothesis as what \emph{this derivation} consumes, not as what
-Anderson's system requires. Anderson himself (1990, fn.~5) notes that the
-weaker logic $B$ --- that is, $KTB$ --- suffices for Theorem 3, and
-Benzm\"uller, Weber and Woltzenlogel Paleo~\cite{bww2017} report it automated
-in the weaker $KB$ again, and further report A4 and A5 \emph{redundant} for
-this emendation, derivable from the rest. That last holds under the constant-
-and varying-domain readings they analyse; under the \emph{mixed} reading
-Anderson himself floats --- actualist quantifiers only in Theorem 3 and in the
-definition of essence --- they find A4 still redundant, A5 independent, and a
-countermodel to Theorem 3 itself. Domain choice is not a free parameter.
-
-Our proof is therefore not minimal, in frame strength or in axioms; reaching
-$KB$ would need a different route, since Lemma~\ref{lem:transfer} uses
-transitivity and the necessary-existence step uses reflexivity. An earlier
-version of this note reported the $S5$ as a cost of Anderson's variant, which
-was a mistake of exactly the kind Section~\ref{sec:caveats} warns about.
-
-\begin{proof}
-God-likeness is an $\ess^{\mathrm{A}}$-essence of any God-like $x$: the forward
-direction of the biconditional follows from A4 and reflexivity, the backward
-direction from Lemma~\ref{lem:transfer}. The rest is as in
+God-likeness is then an $\ess^{\mathrm{A}}$-essence of any God-like $x$: the
+forward direction of the biconditional follows from A4 and reflexivity, the
+backward direction from Lemma~\ref{lem:transfer}. The rest runs as in
 Theorem~\ref{thm:T3}, with $\Pos(\NE^{\mathrm{A}})$ supplying necessary
 existence and reflexivity bringing $\Box\NE^{\mathrm{A}}(g)$ down to
-$\NE^{\mathrm{A}}(g)$.
-\end{proof}
+$\NE^{\mathrm{A}}(g)$. Lemma~\ref{lem:andboxgod} obtains the conclusion of
+Lemma~\ref{lem:transfer} from A3$^{*}$ alone, which is what makes the whole
+detour avoidable.
 
 \subsection{Fitting: extensions in place of intensions}
 
@@ -869,11 +980,22 @@ biconditionals.
 One small thing the formalization turned up. In Scott's system the step ``what
 a God-like individual has is positive'' (Lemma~\ref{lem:posgod}) is classical,
 because it argues by contradiction through A1b. Anderson has no A1b, and his
-corresponding steps --- Proposition~\ref{prop:mono}, Lemma~\ref{lem:transfer},
-the essence theorem and the necessary-existence step --- are all
-\emph{constructive}; Lean reports them as depending on no axioms at all. Only
-Theorem~1, and hence Theorem~\ref{thm:andT3}, remains classical. Fitting keeps
-A1b and with it the classical step.
+corresponding steps --- Lemma~\ref{lem:andboxgod}, Lemma~\ref{lem:transfer}, the
+essence theorem, and Proposition~\ref{prop:nevac} with its
+Corollary~\ref{cor:a5} --- are all \emph{constructive}; Lean reports them as
+depending on no axioms at all. Fitting keeps A1b and with it the classical
+step.
+
+Classicality enters Anderson's system at exactly one place: Theorem~1, whose
+proof is a reductio. Everything that routes through it inherits that, including
+Theorem~\ref{thm:andT3} and Proposition~\ref{prop:a4}. It is worth recording
+that Proposition~\ref{prop:mono} moved into this class when we removed its
+reflexivity hypothesis: the earlier proof used reflexivity to produce an
+accessible world and was constructive, whereas the present one obtains that
+world from Theorem~1 and is not. Dropping a frame condition was not free; it
+was paid for in logical strength elsewhere. Which of the two is preferable
+depends on what one wants the certificate to certify, and we keep the weaker
+hypothesis on the view that frame conditions are the scarcer resource here.
 \end{remark}
 
 \subsection{What is simplified here}\label{sec:variantscaveats}
@@ -994,7 +1116,9 @@ Modal collapse (Thm.~\ref{thm:collapse}) & all of Scott's       & symmetry \quad
 $r$ is equality (Thm.~\ref{thm:frame}) & all of Scott's         & symmetry \quad($KB$) \\
 One world (Thm.~\ref{thm:oneworld})   & all of Scott's          & universal \quad($S5U$) \\
 \midrule
-Anderson's Thm.~3 (Thm.~\ref{thm:andT3}) & all of Anderson's$^{\dagger}$ & symmetry \quad($KB$)$^{\dagger}$ \\
+Anderson's Thm.~3 (Thm.~\ref{thm:andT3}) & A1a, A2, A3$^{*}$ \emph{only} & symmetry \quad($KB$) \\
+\quad A5 for Anderson (Cor.~\ref{cor:a5}) & A2, A3$^{*}$        & none \quad($K$) \\
+\quad A4 for Anderson (Prop.~\ref{prop:a4}) & A1a, A2, A3$^{*}$ & symm.\ + trans.\ \quad($K4B$) \\
 Fitting's Thm.~3 (Thm.~\ref{thm:fitT3})  & all of Fitting's     & none \quad($K$) \\
 H\'ajek's Thm.~3 (Thm.~\ref{thm:hajT3})  & H:A12, A3 \emph{only} & symmetry \quad($KB$) \\
 \bottomrule
@@ -1002,19 +1126,31 @@ H\'ajek's Thm.~3 (Thm.~\ref{thm:hajT3})  & H:A12, A3 \emph{only} & symmetry \qua
 \end{center}
 
 \noindent
-$^{\dagger}$ These are the published values, not ours. Our Lean derivation of
-Anderson's Theorem 3 uses reflexivity, transitivity and symmetry and the whole
-axiom set; Anderson (fn.~5) and~\cite{bww2017} give $KB$, with A4 and A5
-redundant. Every other entry is what our proof consumes.
+Every entry is what our proof consumes. In an earlier version the Anderson row
+carried a dagger, because our derivation then used $S5$ and the whole axiom set
+while the published values were $KB$ with A4 and A5 redundant. The dagger is
+gone: Theorem~\ref{thm:andT3} is now the $KB$ derivation, and the two
+redundancy results are Corollary~\ref{cor:a5} and Proposition~\ref{prop:a4}.
+The published results came first and were obtained by automated provers; ours
+add no mathematics, only the guarantee that the stated hypotheses are the ones
+actually used.
 
 By Proposition~\ref{prop:nosymm} the symmetry entries for Scott are sharp: they
 fail over a reflexive transitive frame, so no weakening in the $S4$ direction
 is available there. The last three rows are the point of
 Section~\ref{sec:variants}: Fitting pays no frame strength at all, H\'ajek pays
-the same as Scott but with two of his four axioms unused, and Anderson --- on
-the published analysis --- pays no more than Scott either. All three avoid the
-collapse, at differing frame strengths. Frame strength is not the variable that
-matters; the shape of the essence clause is.
+the same as Scott but with two of his four axioms unused, and Anderson pays the
+same as Scott with two of his five axioms not merely unused but derivable. All
+three avoid the collapse, at differing frame strengths. Frame strength is not
+the variable that matters; the shape of the essence clause is.
+
+The Anderson and H\'ajek rows are strikingly alike, and for the same structural
+reason: both define God-likeness by a biconditional whose right-hand side is
+already a $\Box$, so that the axiom asserting God-likeness positive converts in
+one step into the necessity of God-likeness. Everything the essence apparatus
+was built to deliver is then already in hand. That is why A4 and A5 --- the
+rigidity of positivity and the positivity of necessary existence --- end up
+carrying nothing in either system.
 
 \noindent
 Two comments. First, the refutation of G\"odel's axioms needs no frame
@@ -1085,9 +1221,13 @@ it is checked rather than asserted. The correspondence with this note is
 \verb|iso_satisfies_scott|        & Proposition~\ref{prop:iso} \\
 \verb|ns_satisfies_scott|, \verb|ns_not_T3|, & \\
 \quad \verb|ns_not_modal_collapse| & Proposition~\ref{prop:nosymm} \\
+\verb|Anderson.box_god|           & Lemma~\ref{lem:andboxgod} \\
 \verb|Anderson.monotheism|        & Proposition~\ref{prop:mono} \\
-\verb|Anderson.god_transfers|     & Lemma~\ref{lem:transfer} \\
 \verb|Anderson.T3|                & Theorem~\ref{thm:andT3} \\
+\verb|Anderson.ne_universal|      & Proposition~\ref{prop:nevac} \\
+\verb|Anderson.A5_of_A2_A3p|      & Corollary~\ref{cor:a5} \\
+\verb|Anderson.A4_of_core|        & Proposition~\ref{prop:a4} \\
+\verb|Anderson.god_transfers|     & Lemma~\ref{lem:transfer} \\
 \verb|Fitting.T3|                 & Theorem~\ref{thm:fitT3} \\
 \verb|Hajek.T3|                   & Theorem~\ref{thm:hajT3} \\
 \verb|Anderson.noCollapse|, \verb|Fitting.noCollapse|, & \\

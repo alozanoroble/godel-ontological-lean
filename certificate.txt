@@ -1,27 +1,30 @@
 Axiom certificate — Godel's ontological argument in Lean 4
 ===========================================================
 
-Produced 2026-09-19 on C3P0.
+Produced 2026-09-20 on C3P0.
   Lean 4 v4.34.0, no external dependencies (no Mathlib).
-  Reproduce with:  scripts/sync-lean.sh cert
+  Reproduce with:  lake build && lake env lean Certificate.lean
+  (in this repo, scripts/sync-lean.sh cert does both under WSL)
+
+Supersedes certificate-20260919.txt, which remains valid for the development
+as it stood that day.  What changed: Anderson's Theorem 3 is now derived in
+KB from three axioms instead of in S5 from five, and the two published
+redundancy results for A4 and A5 are proved rather than cited.  See the note
+after the dump.
 
 Verbatim output of `lake env lean Certificate.lean`:
 
--- Godel 1970: the refutation
 'Godel.possibly_exists' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Godel.emptyProperty_ess' does not depend on any axioms
 'Godel.inconsistent_of_A1_A2_A5' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Godel.godel_1970_inconsistent' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Godel.godel_1970_inconsistent_S5' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Godel.empty_not_scottEss' does not depend on any axioms
-
--- Scott 1987: the positive argument
 'Godel.positive_of_god' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Godel.scott_T2' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Godel.exists_god' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Godel.scott_T3' depends on axioms: [propext, Classical.choice, Quot.sound]
-
--- The price: modal collapse and what it does to the frame
+'Godel.scott_monotheism' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Godel.modal_collapse' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Godel.modal_collapse_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Godel.s5_unique_world' depends on axioms: [propext, Classical.choice, Quot.sound]
@@ -30,329 +33,48 @@ Verbatim output of `lake env lean Certificate.lean`:
 'Godel.accessibility_eq' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Godel.box_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Godel.dia_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
-
--- Models
 'Godel.toy_satisfies_A1_A2_A3_A4' does not depend on any axioms
 'Godel.toy_not_A5' does not depend on any axioms
 'Godel.toy_satisfies_scott' does not depend on any axioms
 'Godel.iso_satisfies_scott' does not depend on any axioms
 'Godel.scott_two_worlds' does not depend on any axioms
-
-
-How to read this
-----------------
-
-Neither Godel's nor Scott's axioms appear in this list.  That is the point:
-they are not axioms of the Lean development, they are *hypotheses*, and every
-theorem is a conditional --- which is what claims of this kind should be.  Had
-they been declared with Lean's `axiom` command, the development would have been
-globally inconsistent and this certificate worthless.
-
-What does appear is only Lean's own three foundational axioms:
-
-  propext           propositional extensionality
-  Classical.choice  the axiom of choice
-  Quot.sound        soundness of quotient types
-
-and these enter at exactly two places, both classical "suppose not" steps:
-`possibly_exists` (Theorem 1) and `positive_of_god`.
-
-The five axiom-free results are all explicit models, checked constructively.
-In particular the consistency of Scott's system is certified by an inspectable
-model, not by a model finder.
-
-
-What each result needs
-----------------------
-
-  Result                        Axioms used            Frame condition
-  ----------------------------  ---------------------  -----------------
-  possibly_exists (Thm 1)       A1a, A2                none
-  emptyProperty_ess             none                   none
-  inconsistent_of_A1_A2_A5      A1a, A2, P(NE)         none        (K)
-  scott_T2 (Thm 2)              A1b, A4                none
-  scott_T3 (Thm 3)              all of Scott's         symmetry    (B)
-  modal_collapse                all of Scott's         symmetry    (B)
-  accessibility_eq              all of Scott's         symmetry    (B)
-  s5_unique_world               all of Scott's         universal   (S5U)
-
-The refutation of Godel's axioms takes NO frame hypothesis at all, so it is not
-an artefact of choosing S5: the axioms are inconsistent in K, the weakest
-normal modal logic.  The positive argument takes only symmetry --- the logic B
---- not the reflexivity and transitivity of S5.
-
-Both statements are checked, not asserted: frame conditions are hypotheses of
-the Lean theorems rather than properties baked into the semantics, so their
-absence from a statement is a fact about the proof.  Note also that
-`serial_of_scott` and `refl_of_scott` DERIVE seriality and reflexivity from
-Scott's axioms rather than assuming them.
-
-Other hypotheses: `Nonempty W` is needed for the refutation (with no worlds
-every axiom is vacuous).  Nonemptiness of the individual type `I` is NOT needed
-anywhere --- individuals are produced, never postulated.
-
-
-The two headline pairs
-----------------------
-
-1. What Godel's missing conjunct costs:
-
-     toy_not_A5           Godel's  A5, P(NE),  FAILS in the one-world model
-     toy_satisfies_scott  Scott's  A5, P(NES), HOLDS in the same model
-
-   Same structure, same notion of positivity, opposite verdicts.  The only
-   difference between NE and NES is the conjunct phi(x) in the definition of
-   essence.
-
-2. What modal collapse costs:
-
-     accessibility_eq     Scott's axioms + symmetry force  r w v <-> v = w
-     iso_satisfies_scott  Scott's axioms hold over a world set of ANY size
-
-   Together: models exist at every cardinality, but every one of them is a
-   disjoint heap of isolated one-world models.  No world can see another, so
-   box and diamond are the identity operation (box_iff, dia_iff) and the modal
-   language in which the argument is stated has no content left.  The answer to
-   "is there a non-degenerate model?" is yes in cardinality, no in modal
-   structure.
-
-
-Provenance
-----------
-
-The inconsistency, the Empty Essence Lemma and the K-refutation are due to
-Benzmuller and Woltzenlogel Paleo, "The inconsistency in Godel's ontological
-argument: a success story for AI in metaphysics", IJCAI-16, pp. 936-942
-(section 4.1); they reconstructed it in Isabelle/HOL.  Theorems 1-3 are
-Godel's; modal collapse is Sobel's; the consistency of Scott's system was
-established in the same IJCAI paper with a model finder.  The frame reading of
-modal collapse is standard --- the condition  forall x y, r x y -> y = x  is
-stated directly as a rendering of MC in the literature on computational
-variants of the argument.
-
-None of this is new mathematics.  What this development contributes is an
-independent Lean 4 mechanization with the dependency structure made explicit:
-the frame-condition accounting above, and the fact that every result is a
-conditional resting on nothing but Lean's own three axioms.
-
-
-Addendum: symmetry is necessary (added same day)
-------------------------------------------------
-
 'Godel.ns_satisfies_scott' does not depend on any axioms
 'Godel.nsR_not_symm' does not depend on any axioms
 'Godel.ns_no_god_at_false' does not depend on any axioms
 'Godel.ns_not_T3' does not depend on any axioms
 'Godel.ns_not_modal_collapse' does not depend on any axioms
 'Godel.ns_not_accessibility_eq' does not depend on any axioms
-
-An explicit two-world model.  W = Bool; world `false` sees both worlds, world
-`true` sees only itself (r w v  iff  w = true -> v = true).  One individual.
-A property is positive, at EITHER world, exactly when the individual has it
-at `true`.
-
-The frame is reflexive (nsR_refl) and transitive (nsR_trans) but not symmetric
-(nsR_not_symm) -- an S4 frame.
-
-In it:
-  ns_satisfies_scott        all six of Scott's axioms HOLD
-  ns_not_T3                 Theorem 3 FAILS at `false`
-  ns_not_modal_collapse     modal collapse FAILS
-  ns_not_accessibility_eq   the frame is not equality
-
-So symmetry cannot be weakened in the S4 direction, and more importantly:
-
-  *** Scott's axioms do not entail modal collapse. ***
-
-They entail it in B and S5 -- which is where the argument is always presented,
-so the standard objection stands where it is usually made.  But collapse is a
-consequence of the axioms TOGETHER WITH a symmetric frame, not of the axioms
-alone.  Symmetry does exactly one job (exists_god): carrying box-exists-God
-from a merely possible world back to the actual one, the B schema
-diamond-box-p -> p.  That is also the step Anderson's and Fitting's variants
-are reported to restructure away, which is why they are valid in K and T and
-avoid the collapse.
-
-All six results are constructive and depend on no axioms at all.
-
-
-Addendum: Anderson's and Fitting's variants (added same day)
------------------------------------------------------------
-
--- Fitting (2002): positivity over EXTENSIONS, with actualist quantifiers
 'Godel.Fitting.T1' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Godel.Fitting.positive_of_god' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Godel.Fitting.god_essential' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Godel.Fitting.box_exists_of_god' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Godel.Fitting.possible_deRe' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Godel.Fitting.monotheism' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Godel.Fitting.T3' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Godel.Fitting.god_stable' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Godel.Fitting.T3_deDicto' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Godel.Fitting.noCollapse_axioms' does not depend on any axioms
 'Godel.Fitting.noCollapse' does not depend on any axioms
-
--- Anderson (1990): biconditional God-likeness and essence, no A1b
 'Godel.Anderson.T1' depends on axioms: [propext, Classical.choice, Quot.sound]
-'Godel.Anderson.monotheism' does not depend on any axioms
+'Godel.Anderson.axiomA1_iff_A1star' does not depend on any axioms
+'Godel.Anderson.monotheism' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Godel.Anderson.box_god' does not depend on any axioms
+'Godel.Anderson.god_back' does not depend on any axioms
+'Godel.Anderson.exists_god' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Godel.Anderson.T3' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Godel.Anderson.ne_universal' does not depend on any axioms
+'Godel.Anderson.A5_of_A2_A3p' does not depend on any axioms
+'Godel.Anderson.A4_of_core' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Godel.Anderson.god_transfers' does not depend on any axioms
 'Godel.Anderson.god_essential' does not depend on any axioms
 'Godel.Anderson.box_exists_of_god' does not depend on any axioms
-'Godel.Anderson.T3' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Godel.Anderson.T3_viaEssence' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Godel.Anderson.noCollapse_axioms' does not depend on any axioms
 'Godel.Anderson.noCollapse' does not depend on any axioms
-
-
-What each variant needs
------------------------
-
-  Result                    Frame condition       Notes
-  ------------------------  --------------------  -------------------------
-  Anderson.T3               refl + trans + symm   full S5
-  Fitting.T3                NONE                  logic K
-
-Fitting needs no frame condition because his God-likeness, evaluated at w, is
-fixed by the positivity facts AT w; a witness found at an accessible world is
-a witness simpliciter, so nothing has to be carried back.  That carrying-back
-is exactly what symmetry bought in Scott's `exists_god` (see the addendum
-above), so this is the same fact seen from the other side.
-
-Anderson pays MORE in frame strength than Scott does (full S5, not just B),
-and still avoids the collapse -- so frame strength is not by itself what
-brings the collapse; the shape of the essence clause is.
-
-
-Both avoid modal collapse
--------------------------
-
-  Fitting.noCollapse_axioms / Fitting.noCollapse
-  Anderson.noCollapse_axioms / Anderson.noCollapse
-
-Each is a two-world model over the UNIVERSAL relation -- an S5 frame -- in
-which all of that variant's axioms hold and modal collapse fails.  Each also
-certifies the consistency of its variant.  All four results are constructive
-and axiom-free.
-
-Mechanisms, which differ:
-
-  Fitting   the essence clause quantifies over EXTENSIONS (world-independent
-            sets).  The collapse proof for Scott smuggled the sentence p in
-            as the constant INTENSIONAL property  \y w. p w , which tracks p
-            from world to world.  No extension can do that, so the
-            substitution has no counterpart.
-
-  Anderson  God-likeness and essence are stated entirely in terms of box, so
-            a merely contingent sentence never satisfies the antecedent of
-            the essence clause.
-
-
-An observation from the certificate
------------------------------------
-
-Anderson's monotheism, god_transfers, god_essential and box_exists_of_god are
-all CONSTRUCTIVE -- no axioms at all.  In Scott's system the corresponding
-step (positive_of_god) is classical, because it argues by contradiction
-through A1b.  Anderson has no A1b, and the classicality goes with it.  Only
-Theorem 1, and hence Anderson.T3, remains classical.  Fitting keeps A1b and
-keeps the classical step.
-
-
-Simplifications (stated in the paper, section 9.4)
---------------------------------------------------
-
-Fitting's formalization here carries an explicit existence predicate and uses
-actualist quantifiers.  That is NOT optional: a Fitting extension is
-world-independent, so with constant domains "S is empty" would be
-world-independent, Theorem 1 would give actual rather than merely possible
-exemplification, and T3 would follow WITHOUT EVER USING A5 -- which is not
-Fitting's argument.
-
-Anderson's formalization uses constant domains, where that costs nothing
-structural: his God-likeness is intensional, so exists-x-God(x) still varies
-from world to world and A5 still does real work.
-
-NOT modelled: Fitting's intension/extension operators, hence the de re / de
-dicto distinction.  Fitting.T3 is the de re reading (God-likeness frozen at
-the world of evaluation); Benzmuller and Fuenmayor report the de dicto
-reading is invalid.
-
-Following Benzmuller and Fuenmayor, arXiv:1910.08955, and the AFP entry
-"Types, Tableaus and Godel's God in Isabelle/HOL" (2017), which render
-Anderson's variant as Fitting presents it.
-
-
-Addendum: de re vs de dicto in Fitting's variant (added same day)
------------------------------------------------------------------
-
-'Godel.Fitting.possible_deRe' depends on axioms: [propext, Classical.choice, Quot.sound]
-'Godel.Fitting.monotheism' depends on axioms: [propext, Classical.choice, Quot.sound]
-'Godel.Fitting.god_stable' depends on axioms: [propext, Classical.choice, Quot.sound]
-'Godel.Fitting.T3_deDicto' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Godel.Fitting.dd_axioms' does not depend on any axioms
 'Godel.Fitting.dd_possible_deRe' does not depend on any axioms
 'Godel.Fitting.dd_not_possible_deDicto' does not depend on any axioms
 'Godel.Fitting.dd_not_A4' does not depend on any axioms
-
-
-A correction to the previous addendum
--------------------------------------
-
-The earlier note said the de re / de dicto distinction "needs Fitting's
-intension/extension operators" and was therefore not modelled.  That was
-wrong twice over.
-
-First, the distinction needs no extra machinery in a shallow embedding.
-Fitting's `down' operator is needed to write his SYNTAX; semantically the
-difference is only where a world variable is bound:
-
-  de re     forall v, r w v -> exists z, Ex z v  /\  God P z w
-  de dicto  forall v, r w v -> exists z, Ex z v  /\  God P z v
-
-Both were already expressible in the file as written.
-
-Second, the failure Benzmuller and Fuenmayor report is NOT a failure of the
-de dicto reading of the CONCLUSION.  Their T3 is the POSSIBILITY statement,
-refuted in their Part I, where only A1a, A1b, A2 and T2 are available.  Their
-Part II adds A4, and in section 5.4 their GodNecExists-v1 -- the de dicto
-NECESSARY existence -- is PROVED.  So with the full axiom set both readings
-of the conclusion hold.
-
-
-What is now settled
--------------------
-
-  Fitting.T3           de re  necessary existence   -- theorem, logic K
-  Fitting.T3_deDicto   de dicto necessary existence -- theorem, logic K
-
-The bridge is `god_stable': A4 carries the extension godExt P w forward along
-r, so anything God-like at v lies in it and is therefore God-like at w; and
-God-like individuals are unique at a world (Fitting.monotheism, the same A1b
-trick as Anderson's).  So the two readings agree.
-
-  Fitting.dd_axioms                 Part I axioms HOLD in a 2-world model
-  Fitting.dd_possible_deRe          de re possibility HOLDS there
-  Fitting.dd_not_possible_deDicto   de dicto possibility FAILS there
-  Fitting.dd_not_A4                 A4 fails there, as it must
-
-The model: two worlds and two individuals; each world sees only the OTHER
-world (r w v iff w /= v); the individual existing at a world is the OTHER one
-(Ex z v iff z /= v); a set is positive at w iff it contains w's own
-individual.  God-likeness at w is then "being w's own individual" -- which is
-exactly the individual that does not exist at w.
-
-Two structural facts fall out of the construction:
-
-  - The separation needs a NON-UNIVERSAL frame.  A4 propagates positivity
-    along r, so over the universal relation it makes positivity, and hence
-    God-likeness, world-independent, and the two readings identical.
-
-  - The separation needs VARYING DOMAINS.  The room for the readings to come
-    apart is an individual God-like as read off at w that does not EXIST at
-    v.  This is a second reason, independent of the one in the previous
-    addendum, why the existence predicate in Fitting.lean is not optional.
-
-All four countermodel results are constructive and axiom-free.
-
-
-Addendum: Hajek's first emendation, AOE (added same day)
----------------------------------------------------------
-
 'Godel.Hajek.A1a_of_A12' does not depend on any axioms
 'Godel.Hajek.T1' depends on axioms: [propext, Classical.choice, Quot.sound]
 'Godel.Hajek.box_exists_of_god' does not depend on any axioms
@@ -361,154 +83,87 @@ Addendum: Hajek's first emendation, AOE (added same day)
 'Godel.Hajek.noCollapse_axioms' does not depend on any axioms
 'Godel.Hajek.noCollapse' does not depend on any axioms
 
+Note: Anderson's Theorem 3 in KB, and the redundancy of A4 and A5
+-----------------------------------------------------------------
 
-The system
-----------
+The 2026-09-19 certificate derived Anderson's T3 from reflexivity,
+transitivity AND symmetry, using all five of his axioms, and recorded the gap
+to the published KB result as open work.  That gap is now closed.
 
-Hajek merges A1 and A2 into one weaker axiom:
+  'Godel.Anderson.box_god'       does not depend on any axioms
+  'Godel.Anderson.god_back'      does not depend on any axioms
+  'Godel.Anderson.exists_god'    [propext, Classical.choice, Quot.sound]
+  'Godel.Anderson.T3'            [propext, Classical.choice, Quot.sound]
 
-  H:A12   ( P(phi) /\ box forall x (phi x -> psi x) )  ->  not P(not psi)
+T3 now takes `AxCore` -- A1a, A2, A3* -- and `Symm r`.  It does NOT take A4
+or A5, and this is enforced by the type: `AxCore` has no such fields, so the
+proof could not use them even by accident.
 
-Anderson's A1a is the case psi := phi; A2 is NOT assumed (the conclusion is
-only that not-psi fails to be positive, not that psi is positive).  He then
-rebuilds God-likeness on the derived notion
+The argument.  Anderson's God-likeness is a BICONDITIONAL,
 
-  P#(phi)  :=  exists psi ( P(psi) /\ box forall y (psi y -> phi y) )
-  G^H(x)   :=  forall phi ( box phi(x)  <->  P#(phi) )
+    G(x)  :=  forall phi ( P(phi) <-> box phi(x) ).
 
-keeping Anderson's essence and necessary existence unchanged.
+Instantiate it at phi := G.  Axiom A3* says P(G), so the biconditional yields
+box G(x) directly: a God-like individual is NECESSARILY God-like.  That is
+`box_god`, and it needs no frame condition and no other axiom.  Everything
+else follows:
 
+  - T1 (A1a, A2) gives a God-like g at SOME world v accessible from w;
+  - symmetry gives r v w, and box_god at v carries g back to w  (god_back);
+  - box_god at w pushes g out to every world accessible from w  (T3).
 
-*** A4 and A5 are superfluous ***
----------------------------------
+A1a and A2 are used only inside T1, and only to guarantee that w has a
+successor at all.
 
-This is checked by the type, not asserted:
+Monotheism improved likewise: it previously assumed reflexivity, to bring
+`box (y = x)` down to `y = x`.  T1 already supplies an accessible world, so
+`Godel.Anderson.monotheism` now needs NO frame condition.
 
-  theorem T3 (hs : Symm r) (h : AxCore r P) (w : W) : ...
+The two redundancy results, previously cited from Benzmuller-Weber-
+Woltzenlogel Paleo (2017) and now proved:
 
-`AxCore` contains ONLY H:A12 and A3.  A4 (positivity is necessary) and A5
-(necessary existence is positive) live in the separate structure `Ax`, and
-appear nowhere in the derivation.  Benzmuller, Weber and Woltzenlogel Paleo
-report exactly this superfluousness, and add that A4 and A5 are nonetheless
-INDEPENDENT of the rest -- superfluous without being redundant.  The
-independence needs a further pair of models and is NOT formalized here.
+  'Godel.Anderson.ne_universal'    does not depend on any axioms
+  'Godel.Anderson.A5_of_A2_A3p'    does not depend on any axioms
+  'Godel.Anderson.A4_of_core'      [propext, Classical.choice, Quot.sound]
 
-The mechanism is `box_exists_of_god', and it is short.  G^H is positive by A3,
-so it is trivially necessarily implied by a positive property -- itself -- and
-therefore P#(G^H) holds outright.  The biconditional in G^H(g) converts that
-directly into box G^H(g): the God-like individual is necessarily God-like.
-Where Scott needs A5 and an essence argument to make God-like existence
-necessary, Hajek's definition delivers it with no axioms beyond A3 and NO
-FRAME CONDITION AT ALL.
+A5 in K.  Anderson's essence is also a biconditional,
 
-Frame condition for T3: symmetry only, used once, at the same place as in
-Scott's system -- carrying the conclusion back from a merely possible world.
+    phi ess x  :=  forall psi ( box psi(x) <-> box forall y (phi(y) -> psi(y)) ).
 
+Put psi := phi.  The right-hand side becomes box forall y (phi(y) -> phi(y)),
+a validity, so box phi(x) holds.  Hence anything that is an essence of x is
+necessarily had by x, so necessarily instantiated -- by x.  So NE holds of
+EVERY individual at EVERY world (`ne_universal`), with no axioms and no frame
+condition whatsoever.  A2 applied to A3* then lifts that to P(NE), which is
+A5.  Anderson's necessary existence is the universally true property, which
+is a sharper statement than redundancy: A5 is not merely derivable, it is
+contentless.
 
-Where the emendations now stand
--------------------------------
+A4 in K4B.  Given P(phi) at w and r w u: exists_god gives a God-like g at w
+(symmetry), box_god makes it God-like at u too, so P(phi) at u reduces to
+box phi(g) at u.  God-likeness of g at w turns the hypothesis into box phi(g)
+at w, and transitivity carries those witnesses to every world accessible
+from u.
 
-  Variant    Axioms used for T3     Frame condition    Collapse
-  ---------  ---------------------  -----------------  --------
-  Scott      all                    symmetry  (B)      YES
-  Anderson   all                    refl+trans+symm    no
-                                    (S5)
-  Fitting    all                    none      (K)      no
-  Hajek      H:A12, A3 only         symmetry  (B)      no
+Both match the frame conditions reported in the 2017 study -- A5 already in
+K, A4 in K4B.  NOTHING HERE IS NEW MATHEMATICS.  The published results were
+obtained by automated theorem provers; what is new in this development is
+only that the frame condition and the axiom list are now carried by Lean's
+type checker rather than asserted in a comment.
 
-Frame strength is not the variable that matters.  Anderson pays MORE than
-Scott and escapes; Fitting pays nothing and escapes; Hajek pays the same as
-Scott, with half his axioms unused, and escapes.  What differs is the shape of
-the God-likeness and essence clauses.
+Scope.  All of this is for the CONSTANT-DOMAIN (possibilist) reading used
+throughout this development.  The 2017 study finds A4 still redundant but A5
+INDEPENDENT under the mixed reading Anderson floats, with a countermodel to
+T3 itself.  None of the above transfers to that reading.
 
+Anderson's own essence route is retained for comparison:
 
-Modal collapse
---------------
+  'Godel.Anderson.T3_viaEssence'  [propext, Classical.choice, Quot.sound]
 
-`Hajek.noCollapse_axioms' is a two-world model over the UNIVERSAL relation --
-an S5 frame -- satisfying ALL of AOE including A4 and A5, so it also certifies
-the consistency of the full axiom set.  `Hajek.noCollapse' shows collapse
-fails there.  Both constructive and axiom-free.
+Same conclusion, but consuming reflexivity, transitivity, A4 and A5.  Keeping
+both side by side is the point: the S5 was a property of that argument, never
+of Anderson's system.
 
-Mechanism: as with Anderson's variant, G^H is stated entirely in terms of box,
-so a merely contingent sentence never reaches the biconditional.
-
-Note `A1a_of_A12' and `box_exists_of_god' are constructive.  T1 is classical
-and additionally needs propositional extensionality, for `pneg_pneg' -- the
-derivation instantiates H:A12 at psi := not-phi and must identify not-not-phi
-with phi.
-
-Following Benzmuller, Weber and Woltzenlogel Paleo, "Computer-Assisted
-Analysis of the Anderson-Hajek Ontological Controversy", Logica Universalis 11
-(2017), pp. 139-151, Figure 3.  Hajek's second and third emendations (AOE0 and
-AOE*, their Figures 4 and 5) are not formalized here.
-
-
-Addendum: corrections following external review (2026-09-20)
--------------------------------------------------------------
-
-'Godel.scott_monotheism' depends on axioms: [propext, Classical.choice, Quot.sound]
-
-Two external reviews of the public site were checked claim by claim.  Two
-substantive errors were confirmed and are corrected; one terminology error was
-confirmed; several overstatements were toned down.
-
-1. UNIQUENESS IS NOT PECULIAR TO ANDERSON.
-   The site and Anderson.lean claimed Scott's system cannot prove monotheism.
-   FALSE.  `Godel.scott_monotheism` now proves
-
-       God P x w -> God P y w -> y = x
-
-   from A1b ALONE -- no frame condition, no A4, no A5.  The trick is the same
-   one already used in Fitting.monotheism and Anderson.monotheism; it was
-   simply never applied to Scott.  Verified, not merely conceded.
-
-2. ANDERSON DOES NOT REQUIRE S5.
-   The site presented "needs full S5" as a cost of Anderson's variant.  That
-   is a fact about THIS Lean proof, not about Anderson's system.  Anderson
-   (1990, fn. 5) notes B suffices; Benzmueller, Weber and Woltzenlogel Paleo
-   (Logica Universalis 11, 2017) report T3 automated in KB, and A4 and A5
-   REDUNDANT for Anderson's emendation.  All such claims are now labelled as
-   properties of the derivation.  Tightening the proof toward KB is open work:
-   god_transfers uses transitivity and box_exists_of_god uses reflexivity.
-
-3. TERMINOLOGY: B vs KB.
-   Symmetry alone is KB.  The logic conventionally named B is KTB, which also
-   assumes reflexivity.  Corrected throughout.
-
-4. ANDERSON'S P(G) MISLABELLED.
-   Renamed the structure field from `T2` to `A3p`.  Anderson's own paper
-   numbers it Axiom 3*; Fitting's presentation -- which the AFP development
-   and this file follow -- reaches it as Proposition 11.16 and labels it T2.
-   It is postulated, not derived, so `T2` was actively misleading.  Fitting's
-   own `T2` field keeps its name, which is his, but is now documented as a
-   postulate.
-
-5. HAJEK: WHAT H:A12 RECOVERS.
-   The site said Goedel's full A1 is recovered as the case psi = phi.  FALSE:
-   what is recovered is Anderson's weakened A1a.  Hajek.lean was already
-   correct; the site was not.
-
-6. HAJEK: SUPERFLUOUS, NOT REDUNDANT.
-   The site said Hajek's definition makes A4 and A5 "redundant", contradicting
-   its own later text.  BWW 2017 report them superfluous AND independent --
-   hence NOT redundant.  Corrected.
-
-7. S5 IS NOT UNIVERSAL ACCESSIBILITY.
-   An arbitrary S5 frame is an equivalence relation and may have several
-   classes.  `s5_unique_world` assumes the UNIVERSAL relation, i.e. a single
-   cluster.  Docstrings corrected; `accessibility_eq`, which needs only
-   symmetry, is the general statement.
-
-8. FITTING: WHAT LOSES ITS WORLD.
-   The extension S is world-independent; `P : Ext I -> Sentence W` is not.
-   Whether a set counts as positive may still vary by world unless A4 pins it
-   down.  Clarified.
-
-Also: the possible-worlds primer on the site defined box/diamond over ALL
-worlds, i.e. assumed universal accessibility, on a page whose whole subject is
-the difference between K, KB and S5.  Corrected to general Kripke semantics.
-
-Not accepted: one review asserted the primer was fine as written (it was not),
-and gave a causal account on which the inconsistency runs through modal
-collapse (it does not -- it runs through the empty essence and A5 directly).
+Hajek is unaffected.  His A5 is stated with Anderson's NE, so `ne_universal`
+applies to it -- but Hajek does not assume A2, so `A5_of_A2_A3p` does not run
+in his system, and the "superfluous but independent" verdict for AOE stands.

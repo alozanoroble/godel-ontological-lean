@@ -393,7 +393,7 @@ img{ max-width: 100%; }
     Hájek is Benzmüller, Weber and Woltzenlogel Paleo (2017).</p>
     <p>All five systems are formalised and certified in Lean 4 at
     <a href="https://github.com/alozanoroble/godel-ontological-lean">alozanoroble/godel-ontological-lean</a>.</p>
-    <p class="stamp">Page revised <strong>20 September 2026</strong><span id="rev"> · build 21aa97a</span>. GitHub
+    <p class="stamp">Page revised <strong>20 September 2026</strong><span id="rev"> · build ee6db0b</span>. GitHub
     Pages sets a ten-minute browser cache, so a copy loaded just before an update can lag by that
     much; a hard reload (<span class="kbd">Ctrl</span>/<span class="kbd">⌘</span> +
     <span class="kbd">Shift</span> + <span class="kbd">R</span>) always fetches the current one.</p>
@@ -496,23 +496,26 @@ const SYSTEMS = [
       {tag:"A2", f:"( P(φ) ∧ □∀x ( φ(x) → ψ(x) ) ) → P(ψ)", g:"positivity travels upward", e:"Unchanged."},
       {tag:"A3*", f:"P(Gᴬ)", g:"the revised God-likeness is positive",
        e:"This is Anderson's Axiom 3*: the revised property of being God-like* is positive. It plays the role Gödel's A3 played, for the revised definition.|Fitting's presentation reaches it as Proposition 11.16 and the Isabelle development labels it <span class='mono'>T2</span>; an earlier version of this page copied that label, which wrongly suggested a derived theorem. It is postulated."},
-      {tag:"A4", f:"P(φ) → □P(φ)", g:"positivity is not accidental",
-       e:"Anderson retains A4 and a revised A5*. But later computer-assisted analysis found <strong>both redundant</strong> for this emendation — derivable from the rest, A4 in K4B and A5 already in K — under the constant- and varying-domain readings analysed.|Under the <em>mixed</em> reading Anderson himself floats — actualist quantifiers only in T3 and in the definition of essence — the same study finds A4 still redundant but A5 <em>independent</em>, and reports a countermodel to T3 itself. Domain choice is not a free parameter."},
-      {tag:"A5*", f:"P(NEᴬ)", g:"necessary existence is a perfection", e:"Unchanged in form, built on Anderson's essence. See the note on A4: later analysis found it redundant here."}
+      {tag:"A4", f:"P(φ) → □P(φ)", g:"positivity is not accidental — and derivable",
+       e:"Anderson retains A4 and a revised A5*. But later computer-assisted analysis found <strong>both redundant</strong> for this emendation — derivable from the rest, A4 in K4B and A5 already in K — under the constant- and varying-domain readings analysed.|<strong>Both are now proved in the Lean development</strong> rather than cited. A4 comes out in K4B: given P(φ) at w and an accessible u, the God-like g at w is God-like at u too, so P(φ) at u reduces to □φ(g) at u — and transitivity carries the witnesses across.|Under the <em>mixed</em> reading Anderson himself floats — actualist quantifiers only in T3 and in the definition of essence — the same study finds A4 still redundant but A5 <em>independent</em>, and reports a countermodel to T3 itself. Domain choice is not a free parameter, and none of this transfers there."},
+      {tag:"A5*", f:"P(NEᴬ)", g:"necessary existence is a perfection — and vacuous",
+       e:"Unchanged in form, built on Anderson's essence. It is not merely redundant here but <em>contentless</em>, and the reason is worth seeing.|Anderson's essence is a biconditional: <span class='mono'>φ essᴬ x := ∀ψ (□ψ(x) ↔ □∀y(φ(y) → ψ(y)))</span>. Put ψ := φ. The right-hand side becomes □∀y(φ(y) → φ(y)) — a validity. So □φ(x) holds: anything that is an essence of x is necessarily had by x, hence necessarily instantiated, by x.|So <strong>NEᴬ is true of every individual at every world</strong>, with no axioms and no frame condition at all. A2 applied to A3* then lifts that to P(NEᴬ), which is A5. Necessary existence, the axiom philosophers argue about hardest in Gödel's system, does no work whatever in Anderson's."}
     ]},
     {t:"Theorems", items:[
+      {tag:"□Gᴬ", f:"Gᴬ(x) → □Gᴬ(x)", g:"a God-like being is necessarily God-like",
+       e:"This is the engine of the whole variant, and it is one step. Anderson's God-likeness says the positive properties are <em>exactly</em> those x has necessarily — a biconditional. Feed it the property of being God-like.|A3* says being God-like <em>is</em> positive. The biconditional converts that immediately into □Gᴬ(x). No essence, no A4, no A5, and no condition on the accessibility relation.|Gödel and Scott need the entire essence apparatus plus A5 to reach the corresponding step. Anderson gets it by instantiating a definition at itself."},
       {tag:"MT", f:"Gᴬ(x) ∧ Gᴬ(y) → x = y", g:"monotheism — God-like beings are unique",
-       e:"Take the property of being identical to x: a God-like x has it necessarily, so it is positive, so any God-like y has it too. There is at most one.|The biconditional makes this especially direct — but uniqueness is <em>not</em> peculiar to Anderson. It is derivable in the Gödel/Scott setting too, and this page previously claimed otherwise in error."},
-      {tag:"T3", f:"□∃x Gᴬ(x)", g:"necessarily, a God-like being exists",
-       e:"Anderson presents the final step using S5 but notes explicitly, in footnote 5 of the 1990 paper, that the weaker logic B suffices. Later computer-assisted analysis verifies T3 already in <span class='mono'>KB</span>.|<strong>The Lean derivation on this site uses reflexivity, transitivity and symmetry — stronger than necessary.</strong> That is a limitation of this formalization, not of Anderson's system, and an earlier version of this page wrongly reported it as a cost of the variant."},
+       e:"Take the property of being identical to x: a God-like x has it necessarily, so it is positive, so any God-like y has it too. There is at most one.|Getting from “y = x necessarily” down to “y = x” needs one accessible world — and Theorem 1 already supplies one, so <strong>no frame condition is required</strong>. An earlier version of this proof used reflexivity for that step.|The biconditional makes this especially direct — but uniqueness is <em>not</em> peculiar to Anderson. It is derivable in the Gödel/Scott setting too, and this page previously claimed otherwise in error."},
+      {tag:"T3", f:"□∃x Gᴬ(x)", g:"necessarily, a God-like being exists — in KB, from three axioms",
+       e:"Anderson presents the final step using S5 but notes explicitly, in footnote 5 of the 1990 paper, that the weaker logic B suffices. Later computer-assisted analysis verifies T3 already in <span class='mono'>KB</span>.|<strong>The Lean derivation on this site is now the KB one.</strong> Theorem 1 produces a God-like g at some accessible world; symmetry and □Gᴬ carry it back to the world of evaluation; □Gᴬ again pushes it out to every accessible world. That is the whole proof.|It consumes <strong>A1*, A2 and A3* only</strong> — and A1* and A2 enter solely to guarantee that the world has a successor at all. A4 and A5 are not hypotheses, which the type checker now enforces rather than a comment asserting it.|An earlier version of this page reported the derivation as using reflexivity, transitivity and symmetry, and flagged the gap to KB as open work. It is closed; the older route is kept in the Lean files for comparison."},
       {tag:"MC", f:"p → □p", g:"not entailed — here is a countermodel",
        e:"A two-world model satisfies all of Anderson's axioms while leaving contingency intact. The collapse is genuinely avoided, not merely unproved."}
     ]}
   ],
   diff:{h:"What changed", p:["A1 is halved; God-likeness and essence become biconditionals stated entirely in terms of <span class='mono'>□</span>."]},
-  gain:"Modal collapse is avoided, and the most contentious half of A1 is gone. The biconditional definitions also give a particularly direct route to uniqueness.",
-  lose:"Complexity in the definitions, and — on the published analysis — two axioms that turn out to be redundant. What is <em>not</em> a cost is frame strength: KB suffices, and the S5 used by this site's Lean proof is an artefact of that proof.",
-  facts:[["Frame for T3","symmetry — KB suffices"],["This Lean proof uses","refl + trans + symm (not minimal)"],["A4, A5*","reported redundant"],["Modal collapse","no"]]
+  gain:"Modal collapse is avoided, the most contentious half of A1 is gone, and Theorem 3 comes out in KB from three axioms — cheaper in both frame strength and axioms than Scott's. Uniqueness needs no frame condition at all.",
+  lose:"Complexity in the definitions. And two of the five axioms turn out to carry nothing: A4 and A5 are both derivable, and A5 is not merely redundant but vacuous — Anderson's necessary existence holds of every individual at every world. A system that keeps its most contested axiom while that axiom does no work is telling you something about where the argument's weight really sits.",
+  facts:[["Frame for T3","symmetry — KB"],["Axioms used for T3","A1*, A2, A3* only"],["A4","derivable, in K4B"],["A5*","derivable in K — and vacuous"],["Uniqueness","no frame condition"],["Modal collapse","no"]]
 },
 {
   id:"fitting", name:"Fitting", who:"Melvin Fitting", year:"2002",
@@ -570,7 +573,7 @@ const SYSTEMS = [
 const TABLE = [
   ["Gödel","1970","Inconsistent","bad","⊥: A1a, A2, A5","none (K)","n/a","n/a"],
   ["Scott","c. 1972","Consistent","warn","T3: all five","symmetry (KB)","yes","yes"],
-  ["Anderson","1990","Consistent","ok","T3: all in this proof; A4, A5 reported redundant","KB suffices; this proof uses S5","no","yes"],
+  ["Anderson","1990","Consistent","ok","T3: A1*, A2, A3* only (A4, A5 derivable)","symmetry (KB)","no","yes"],
   ["Fitting","2002","Consistent","ok","T3: all; de re and de dicto both","none (K)","no","yes"],
   ["Hájek","2002","Consistent","ok","T3: H:A12, A3′ only","symmetry (KB)","no","—"]
 ];
