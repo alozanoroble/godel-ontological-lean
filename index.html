@@ -256,7 +256,7 @@ img{ max-width: 100%; }
     <p class="standfirst">Kurt Gödel left a formal ontological argument in his 1970 notes: five axioms,
     three definitions, three theorems. But the axioms and definitions of that original version are
     <em>inconsistent</em> — a fact nobody noticed until 2013. Here is the argument line by line,
-    what went wrong, and four influential repairs.</p>
+    what went wrong, and four influential repairs and reformulations.</p>
   </header>
 
   <section class="primer">
@@ -313,7 +313,7 @@ img{ max-width: 100%; }
     <div class="tscroll">
       <table>
         <thead><tr>
-          <th>System</th><th>Year</th><th>Status</th><th>Axioms used for T3</th>
+          <th>System</th><th>Year</th><th>Status</th><th>Axioms used for key result</th>
           <th>Frame (this proof)</th><th>Modal collapse</th><th>Uniqueness</th>
         </tr></thead>
         <tbody id="tbody"></tbody>
@@ -393,7 +393,7 @@ img{ max-width: 100%; }
     Hájek is Benzmüller, Weber and Woltzenlogel Paleo (2017).</p>
     <p>All five systems are formalised and certified in Lean 4 at
     <a href="https://github.com/alozanoroble/godel-ontological-lean">alozanoroble/godel-ontological-lean</a>.</p>
-    <p class="stamp">Page revised <strong>20 September 2026</strong><span id="rev"> · build 02c7f75</span>. GitHub
+    <p class="stamp">Page revised <strong>20 September 2026</strong><span id="rev"> · build 21aa97a</span>. GitHub
     Pages sets a ten-minute browser cache, so a copy loaded just before an update can lag by that
     much; a hard reload (<span class="kbd">Ctrl</span>/<span class="kbd">⌘</span> +
     <span class="kbd">Shift</span> + <span class="kbd">R</span>) always fetches the current one.</p>
@@ -568,11 +568,11 @@ const SYSTEMS = [
 ];
 
 const TABLE = [
-  ["Gödel","1970","Inconsistent","bad","A1a, A2, A5 → ⊥","none (K)","n/a","n/a"],
-  ["Scott","c. 1972","Consistent","warn","all five","symmetry (KB)","yes","yes"],
-  ["Anderson","1990","Consistent","ok","all (A4, A5 reported redundant)","KB suffices; this proof uses S5","no","yes"],
-  ["Fitting","2002","Consistent","ok","all; de re and de dicto both","none (K)","no","yes"],
-  ["Hájek","2002","Consistent","ok","H:A12, A3′ only","symmetry (KB)","no","—"]
+  ["Gödel","1970","Inconsistent","bad","⊥: A1a, A2, A5","none (K)","n/a","n/a"],
+  ["Scott","c. 1972","Consistent","warn","T3: all five","symmetry (KB)","yes","yes"],
+  ["Anderson","1990","Consistent","ok","T3: all in this proof; A4, A5 reported redundant","KB suffices; this proof uses S5","no","yes"],
+  ["Fitting","2002","Consistent","ok","T3: all; de re and de dicto both","none (K)","no","yes"],
+  ["Hájek","2002","Consistent","ok","T3: H:A12, A3′ only","symmetry (KB)","no","—"]
 ];
 
 const rail = document.getElementById('rail');
